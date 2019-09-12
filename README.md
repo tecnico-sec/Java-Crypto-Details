@@ -28,7 +28,7 @@ MessageDigest md = MessageDigest.getInstance("SHA-256");
 Optionally, by indicating the provider name, the program may request an implementation from a specific provider as in the following:
 
 ```java
-MessageDigest md = MessageDigest.getInstance("SHA-256";, "MyProvider");
+MessageDigest md = MessageDigest.getInstance("SHA-256", "MyProvider");
 ```
 
 Providers may be updated transparently to the application when faster or more secure versions are available. In the Java platform, the java.security.Provider class is the base class for all security providers. Each CSP contains an instance of this class which contains the provider&#39;s name and lists all the security services/algorithms it implements. Multiple providers may be configured at the same time and are listed in order of preference. The highest priority provider that implements that service is selected when a security service is requested.
@@ -135,6 +135,10 @@ You are about to use a symmetric-key encryption algorithm in modes ECB (Electron
 
 In the ECB mode, each block is encrypted with the key independently:
 
+```
+c[i] = E_k (m[i])
+```
+
 ![ECB](ECB.png)
 
 Begin by generating a new AES Key.
@@ -164,7 +168,11 @@ What are the differences between them?
 
 #### CBC (Cipher Block Chaining)
 
-In CBC mode, each block m[i] is XORed with the ciphertext from the previous block, and then encrypted with key k: c[i] = E_k (m[i] ⊕ c[i-1]). 
+In CBC mode, each block m[i] is XORed with the ciphertext from the previous block, and then encrypted with key k: 
+
+```
+c[i] = E_k (m[i] ⊕ c[i-1])
+```
 
 ![CBC](CBC.png)
 
