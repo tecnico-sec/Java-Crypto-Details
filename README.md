@@ -59,7 +59,7 @@ The Classpath is a parameter that specifies the location of user-defined classes
 $ export CLASSPATH="/tmp/JavaCrypto/src"
 ```
 
-Please notice that all steps that follow expect that this was done, so you must change commands to an alternative location if used.
+Please notice that all steps that follow expect that this was done, so you must change commands to an alternative path, if necessary.
 
 **Note** : For every java command, please write the full package names and file paths. They are ommitted for brevity in this guide.
 
@@ -80,39 +80,39 @@ Different code examples are available, such as the RandomImageGenerator, ImageXo
 
 ### One-Time Pads (Symmetric stream cipher)
 
-When they could be correctly used, one-time pads would provide perfect security. 
+If they could be correctly used in practice, one-time pads would provide perfect security. 
 One of the constraints to make them work as expected is that the key stream must never be reused. 
 The following steps visually illustrate what happens if they are reused, even if just once:
 
-- Generate a new 480x480 random image
+Generate a new 480x480 random image:
 
 ```bash
 $ java RandomImageGenerator intro/outputs/otp.png 480 480
 ```
 
-- Perform the bitwise eXclusive OR operation (XOR) with the generated key
+Perform the bitwise eXclusive OR operation (XOR) with the generated key:
 
 ```bash
 $ java ImageXor intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png
 ```
 
-- XOR tux-0480.png with the same generated key
+XOR tux-0480.png with the same generated key:
 
 ```bash
 $ java ImageXor intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png
 ```
 
-- Watch the images encrypted-tecnico.png and encrypted-tux.png. 
+Watch the images encrypted-tecnico.png and encrypted-tux.png. 
 Switch between them and see the differences.
 
-- Make the differences obvious: XOR them together:
+To make the differences obvious, XOR them together:
 
 ```bash
 $ java ImageXor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
 ```
 
 You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information. 
-In the following, C stands for cipher-text, M for plain-text and K for key:         
+The reason is the following:         
 
 ```
 C1 = M1 ⊕ K
@@ -122,26 +122,31 @@ C2 = M2 ⊕ K
 C1 ⊕ C2 = M1 ⊕ M2
 ```
 
+Legend: C stands for cipher-text, M for plain-text, K for key, ⊕ for XOR
+
 The result you get is the XOR of the images. 
-Experiment with other images and sizes.
+You can experiment with other images and sizes.
 
 
 ### Block cipher modes
 
 Now that you know that keys should never be reused, remember that the way you use them is also important. 
-You are about to use a symmetric-key encryption algorithm in modes ECB (Electronic Code Book), CBC (Cipher Block Chaining) and OFB (Output FeedBack), to encrypt the pixels from an image.
+
+We will use a symmetric-key encryption algorithm working in blocks to encrypt the pixels from an image.
+We will use different modes, namely:
+ECB (Electronic Code Book), CBC (Cipher Block Chaining) and OFB (Output FeedBack).
 
 #### ECB (Electronic Code Book)
 
-In the ECB mode, each block is encrypted with the key independently:
+In the ECB mode, each block is independently encrypted with the key:
 
 ```
-c[i] = E_k (m[i])
+C[i] = E_k(M[i])
 ```
 
 ![ECB](ECB.png)
 
-Begin by generating a new AES Key.
+Begin by generating a new AES Key:
 
 ```bash
 $ java AESKeyGenerator w intro/outputs/aes.key
@@ -168,10 +173,10 @@ What are the differences between them?
 
 #### CBC (Cipher Block Chaining)
 
-In CBC mode, each block m[i] is XORed with the ciphertext from the previous block, and then encrypted with key k: 
+In CBC mode, each block M[i] is XORed with the ciphertext from the previous block, and then encrypted with key k: 
 
 ```
-c[i] = E_k (m[i] ⊕ c[i-1])
+C[i] = E_k (M[i] ⊕ C[i-1])
 ```
 
 ![CBC](CBC.png)
@@ -180,7 +185,7 @@ The encryption of the first block can be performed by means of a random and uniq
 
 The AES key will be the same from the previous step.
 
-Encrypt the glider image with it, this time replacing ECB for CBC:
+Encrypt the glider image with it, this time replacing ECB with CBC:
 
 ```bash
 $ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
@@ -190,7 +195,7 @@ Watch the file glider-aes-cbc.png.
 See the difference made by changing only the mode of operation.
 
 Still in the CBC mode, you might have wondered why the IV is needed in the first block. 
-Consider what happens when you encrypt two different images with similar beginnings, and with the same key: the initial cipher text blocks will also be similar!
+Consider what happens when you encrypt two different images with similar beginnings, and with the same key: the initial cipher text blocks would also be similar!
 
 The ImageAESCipher class provided has been deliberately weakened: instead of randomizing the IV, it is always the same.
 
@@ -236,25 +241,29 @@ Why?
 
 What is more secure to use: CBC or OFB?
 
+
 ### Asymmetric ciphers
+
+The goal now is to use asymmetric ciphers, with separate private and public keys.
+RSA is the most well known of these algorithms.
 
 #### Generating a pair of keys with OpenSSL
 
-Private key:
+Generate the key pair:
 
 ```bash
 $ openssl genrsa -out server.key
 ```
 
-Public key:
+Save the public key:
 
 ```bash
 $ openssl rsa -in server.key –pubout \&gt; public.key
 ```
 
-#### Generating a self-signed certificate with these keys:
+#### Generating a self-signed certificate
 
-Certificate Signing Request, using same key:
+Create a Certificate Signing Request, using same key:
 
 ```bash
 $ openssl req -new -key server.key -out server.csr
@@ -273,7 +282,7 @@ Create it:
 $ echo 01 > server.srl
 ```
 
-Then, generating a key to a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
+Then, generating a key for a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
 
 ```bash
 $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
@@ -341,23 +350,27 @@ Based on the ImageAESCipher class create ImageRSACipher and ImageRSADecipher cla
 Encrypt the image with the public key and then decrypt it with the private key.
 Try the same thing with the other images - especially with other sizes.
 
-Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key. For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options. This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small. For large data, hybrid cipher is most suited (combining RSA with AES, for example). 
+Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key. 
+For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options. 
+This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small. 
+For large data, hybrid cipher is most suited (combining RSA with AES, for example). 
 For this exercise you can cipher one block at a time.
 
 
 ### Additional exercise (file tampering)
 
-In the directory grades/inputs, you can find the file grades.txt, the plaintext of a file with the grades of a course. 
+In the directory grades/inputs, you can find the file grades.txt, the plaintext of a file with the grades of a course.
 This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade. Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on par with the rest of your class because you studied for a different exam...
 
-Begin by encrypting this file into ecb.aes. For this example, we will still reuse the AES key generated above and ECB mode.
+Begin by encrypting this file into ecb.aes. 
+For this example, we will still reuse the AES key generated above and ECB mode.
 
 ```bash
 $java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
 ```
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
-(Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not cheating.)
+(Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not perform actual cheating.)
 
 Did you succeed? 
 Did your changes have side effects?
@@ -372,7 +385,8 @@ $java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/ou
 
 How do you compare the results with EBC?
 
-Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. A possibility is to use base 64 encoding that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
+Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. 
+A possibility is to use base 64 encoding that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
 Execute the following to create a base 64 representation of files previously generated.
 
 ```bash
@@ -385,7 +399,7 @@ Decode them:
 $java Base64Decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
-Check if they are similar using the diff command (or fc /b command on Windows).
+Check if they are similar using the diff command (or fc /b command on Windows):
 
 ```bash
 $diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
@@ -393,20 +407,19 @@ $diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 
 It should not return anything.
 
-
 Check the difference on the file sizes. 
 Can you explain it? 
-In percent, how much is it?
+In percentage, how much is it?
 
 Does base 64 provide any kind of security? 
 If so, how?
 
 Use Java to generate the message authentication code (MAC) and digital signature of the grades file. 
-By performing these operations which security requirements are guaranteed?
+By performing these operations, which security requirements can be guaranteed?
 
 
 **Acknowledgments**
 
-This set of exercises is based on the work developed by the student Valmiky Arquissandas within the scope of his project work for this course, and later refined by the teaching staff.
+Original version: Valmiky Arquissandas
 
-Thanks also to Diogo Peres Castilho for his revision of this document.
+Revisions: Diogo Peres Castilho, David R. Matos, Miguel Pardal
