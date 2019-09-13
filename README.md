@@ -236,5 +236,177 @@ Why?
 
 What is more secure to use: CBC or OFB?
 
+### Asymmetric ciphers
 
-TO BE CONTINUED
+#### Generating a pair of keys with OpenSSL
+
+Private key:
+
+```bash
+$ openssl genrsa -out server.key
+```
+
+Public key:
+
+```bash
+$ openssl rsa -in server.key –pubout \&gt; public.key
+```
+
+#### Generating a self-signed certificate with these keys:
+
+Certificate Signing Request, using same key:
+
+```bash
+$ openssl req -new -key server.key -out server.csr
+```
+
+Self-sign:
+
+```bash
+$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+```
+
+For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a .srl file). 
+Create it:
+
+```bash
+$ echo 01 > server.srl
+```
+
+Then, generating a key to a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
+
+```bash
+$ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
+```
+
+Sign the file grades.txt with the user certificate:
+
+```bash
+$ openssl dgst -sha256 grades/inputs/grades.txt \&gt; grades.sha256
+
+$ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 \&gt; grades.sig
+```
+
+Verify the signature with the user key:
+
+```bash
+$ openssl rsautl -verify -in grades.sig -inkey user.key
+
+SHA256(/tmp/sirs/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
+```
+
+and should always match this:
+
+```bash
+$ openssl dgst -sha256 grades/inputs/grades.txt
+
+SHA256(/tmp/sirs/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
+```
+
+Verify the user certificate:
+
+```bash
+$ openssl verify -CAfile server.crt user.crt
+```
+
+user.crt: OK
+
+#### Reading the generated pair of keys with Java
+
+To read the generated keys in Java it is necessary to convert them to the right format.
+
+Convert the private key to PKCS8:
+
+```bash
+$ openssl pkcs8 -topk8 -inform PEM -outform DER -in server.key -nocrypt \&gt; server\_pkcs8.key
+```
+
+Read the key files using the following command:
+
+```bash
+java RSAKeyGenerator r server\_pkcs8.key server.crt
+```
+
+
+#### Generating a pair of keys with Java
+
+Generate a new pair of RSA Keys.
+
+```bash
+$ java RSAKeyGenerator w intro/outputs/priv.key intro/outputs/pub.key
+```
+
+Based on the ImageAESCipher class create ImageRSACipher and ImageRSADecipher classes.
+
+Encrypt the image with the public key and then decrypt it with the private key.
+Try the same thing with the other images - especially with other sizes.
+
+Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key. For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options. This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small. For large data, hybrid cipher is most suited (combining RSA with AES, for example). 
+For this exercise you can cipher one block at a time.
+
+
+### Additional exercise (file tampering)
+
+In the directory grades/inputs, you can find the file grades.txt, the plaintext of a file with the grades of a course. 
+This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade. Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on par with the rest of your class because you studied for a different exam...
+
+Begin by encrypting this file into ecb.aes. For this example, we will still reuse the AES key generated above and ECB mode.
+
+```bash
+$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
+```
+
+Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
+(Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not cheating.)
+
+Did you succeed? 
+Did your changes have side effects?
+
+Now try to attack cbc.aes and ofb.aes. For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
+
+```bash
+$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
+
+$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
+```
+
+How do you compare the results with EBC?
+
+Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. A possibility is to use base 64 encoding that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
+Execute the following to create a base 64 representation of files previously generated.
+
+```bash
+$java Base64Encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
+```
+
+Decode them:
+
+```bash
+$java Base64Decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
+```
+
+Check if they are similar using the diff command (or fc /b command on Windows).
+
+```bash
+$diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
+```
+
+It should not return anything.
+
+
+Check the difference on the file sizes. 
+Can you explain it? 
+In percent, how much is it?
+
+Does base 64 provide any kind of security? 
+If so, how?
+
+Use Java to generate the message authentication code (MAC) and digital signature of the grades file. 
+By performing these operations which security requirements are guaranteed?
+
+
+**Acknowledgments**
+
+This set of exercises is based on the work developed by the student Valmiky Arquissandas within the scope of his project work for this course, and later refined by the teaching staff.
+
+Thanks also to Diogo Peres Castilho for his revision of this document.
