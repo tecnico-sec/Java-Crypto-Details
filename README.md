@@ -422,4 +422,4 @@ By performing these operations, which security requirements can be guaranteed?
 
 Original version: Valmiky Arquissandas
 
-Revisions: Diogo Peres Castilho, David R. Matos, Miguel Pardal
+Revisions: Diogo Peres Castilho, David R. Matos, Miguel Pardal, Ricardo Chaves
