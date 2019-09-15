@@ -366,7 +366,7 @@ Begin by encrypting this file into ecb.aes.
 For this example, we will still reuse the AES key generated above and ECB mode.
 
 ```bash
-$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
+$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
 ```
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
@@ -378,9 +378,9 @@ Did your changes have side effects?
 Now try to attack cbc.aes and ofb.aes. For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
 
 ```bash
-$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
+$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
 
-$java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
+$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
 ```
 
 How do you compare the results with EBC?
@@ -390,19 +390,19 @@ A possibility is to use base 64 encoding that, for every binary sequence of 6 bi
 Execute the following to create a base 64 representation of files previously generated.
 
 ```bash
-$java Base64Encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
+$ java Base64Encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
 ```
 
 Decode them:
 
 ```bash
-$java Base64Decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
+$ java Base64Decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 Check if they are similar using the diff command (or fc /b command on Windows):
 
 ```bash
-$diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
+$ diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 It should not return anything.
