@@ -345,3 +345,6 @@ TSWLatexianTemp*
 
 # standalone packages
 *.sta
+
+# old files folder
+_old
