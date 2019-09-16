@@ -258,7 +258,7 @@ $ openssl genrsa -out server.key
 Save the public key:
 
 ```bash
-$ openssl rsa -in server.key –pubout \&gt; public.key
+$ openssl rsa -in server.key –pubout -out public.key
 ```
 
 #### Generating a self-signed certificate
@@ -291,9 +291,9 @@ $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out
 Sign the file grades.txt with the user certificate:
 
 ```bash
-$ openssl dgst -sha256 grades/inputs/grades.txt \&gt; grades.sha256
+$ openssl dgst -out grades.sha256 -sha256 grades/inputs/grades.txt
 
-$ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 \&gt; grades.sig
+$ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 -out grades.sig
 ```
 
 Verify the signature with the user key:
@@ -327,7 +327,7 @@ To read the generated keys in Java it is necessary to convert them to the right 
 Convert the private key to PKCS8:
 
 ```bash
-$ openssl pkcs8 -topk8 -inform PEM -outform DER -in server.key -nocrypt \&gt; server\_pkcs8.key
+$ openssl pkcs8 -topk8 -inform PEM -outform DER -in server.key -nocrypt -out server\_pkcs8.key
 ```
 
 Read the key files using the following command:
