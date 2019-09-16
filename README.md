@@ -40,34 +40,59 @@ For more information, please read:
 
 ## Cryptographic mechanisms
 
-Copy the lab files into /tmp/JavaCrypto and change your working directory to it 
+### Setup
+
+To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
+
+Put the lab files in a working folder with write permissions, like /tmp/JavaCrypto, for example, and change your working directory to it.
 
 ```bash
 $ cd /tmp/JavaCrypto 
 ```
 
-Compile the code:
+You can compile the code using [Maven](https://maven.apache.org/).
+To do so:
+
+```bash
+$ mvn clean compile
+```
+
+To execute a class with arguments using Maven, write something like:
+
+```bash
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
+```
+
+You can also modify the class and arguments directly in the pom.xml file.
+
+
+If Maven is not available, you can compile the code directly using the Java compiler:
 
 ```bash
 $ javac src/pt/ulisboa/tecnico/meic/sirs/*.java
 ```
+
 You will also need to define the Classpath environment variable. 
-The Classpath is a parameter that specifies the location of user-defined classes and packages. 
+The Classpath is a parameter that specifies the location of user-defined classes and packages
 (for .class files in a named package, the Classpath must end with the directory that contains the first package in the full package name).
 
 ```bash
 $ export CLASSPATH="/tmp/JavaCrypto/src"
 ```
 
-Please notice that all steps that follow expect that this was done, so you must change commands to an alternative path, if necessary.
+Please notice that all steps that follow expect that this was done, so you must adjust paths commands, if necessary.
 
-**Note** : For every java command, please write the full package names and file paths. They are ommitted for brevity in this guide.
+For every java command that follows in this guide, please write the full package names and file paths. 
+They are ommitted for brevity in this guide.
 
 ```bash
 $ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator # instead of just $ java RandomImageGenerator
 ```
 
-In the directory intro/inputs, you can find 3 different images:
+### Image files
+
+The cryptographic operations will be applied to image files, so that its results can be "seen".
+In the directory intro/inputs, you can find three different images:
 
 - Tecnico: \*.png, the IST logo
 - Tux: \*.png, Tux, the Linux penguin
@@ -161,9 +186,9 @@ $ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key ECB int
 Watch the output image. 
 Remember what you have just done: encrypted the image with AES, using ECB mode, and a key you generated yourself.
 
-Feel free to try the same thing with the other images (especially with other sizes).
+Try the same thing with the other images (especially with other sizes).
 
-Try using Java providers to generate a new AES key, by creating a DESKeyGenerator based on the AESKeyGenerator class. 
+Try using Java providers to generate a new AES key.
 What is necessary to change in the code for that to happen?
 
 Repeat all the previous steps for the new key.
@@ -181,7 +206,7 @@ C[i] = E_k (M[i] ⊕ C[i-1])
 
 ![CBC](CBC.png)
 
-The encryption of the first block can be performed by means of a random and unique value known as the Initialization Vector (IV). 
+The encryption of the first block can be performed by means of a random and unique value known as the _Initialization Vector_ (IV). 
 
 The AES key will be the same from the previous step.
 
