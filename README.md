@@ -40,6 +40,7 @@ For more information, please read:
 
 ## Cryptographic mechanisms
 
+
 ### Setup
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
@@ -66,6 +67,8 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -D
 You can also modify the class and arguments directly in the pom.xml file.
 
 
+### Alternative setup
+
 If Maven is not available, you can compile the code directly using the Java compiler:
 
 ```bash
@@ -88,6 +91,7 @@ They are ommitted for brevity in this guide.
 ```bash
 $ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator # instead of just $ java RandomImageGenerator
 ```
+
 
 ### Image files
 
