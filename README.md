@@ -89,7 +89,8 @@ For every java command that follows in this guide, please write the full package
 They are ommitted for brevity in this guide.
 
 ```bash
-$ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator # instead of just $ java RandomImageGenerator
+$ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator 
+# instead of just $ java RandomImageGenerator
 ```
 
 
