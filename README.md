@@ -288,7 +288,7 @@ $ openssl genrsa -out server.key
 Save the public key:
 
 ```bash
-$ openssl rsa -in server.key –pubout > public.key
+$ openssl rsa -in server.key -pubout > public.key
 ```
 
 #### Generating a self-signed certificate
