@@ -1,16 +1,11 @@
 package pt.ulisboa.tecnico.meic.sirs;
 
-import javax.crypto.spec.SecretKeySpec;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
@@ -30,24 +25,21 @@ public class RSAKeyGenerator {
 
         if (mode.toLowerCase().startsWith("w")) {
             System.out.println("Generate and save keys");
-            write(privkeyPath);
-            write(pubkeyPath);
+            write(pubkeyPath, privkeyPath);
         } else {
             System.out.println("Load keys");
-            read(privkeyPath);
-            read(pubkeyPath);            
+            read(pubkeyPath, privkeyPath);
         }
 
         System.out.println("Done.");
     }
 
-    public static void write(String keyPath) throws GeneralSecurityException, IOException {
+    public static void write(String publicKeyPath, String privateKeyPath) throws GeneralSecurityException, IOException {
         // get an AES private key
         System.out.println("Generating RSA key ..." );
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024);
         KeyPair keys = keyGen.generateKeyPair();
-        System.out.println("Finish generating RSA keys");
         
         System.out.println("Private Key:");
         PrivateKey privKey = keys.getPrivate();
@@ -58,24 +50,38 @@ public class RSAKeyGenerator {
         byte[] pubKeyEncoded = pubKey.getEncoded();
         System.out.println(printHexBinary(pubKeyEncoded));       
 
-        System.out.println("Writing Private key to '" + keyPath + "' ..." );
-        FileOutputStream privFos = new FileOutputStream(keyPath);
+        System.out.println("Writing Private key to '" + privateKeyPath + "' ..." );
+        FileOutputStream privFos = new FileOutputStream(privateKeyPath);
         privFos.write(privKeyEncoded);
         privFos.close();
-        System.out.println("Writing Pubic key to '" + keyPath + "' ..." );
-        FileOutputStream pubFos = new FileOutputStream(keyPath);
+        System.out.println("Writing Pubic key to '" + publicKeyPath + "' ..." );
+        FileOutputStream pubFos = new FileOutputStream(publicKeyPath);
         pubFos.write(pubKeyEncoded);
         pubFos.close();        
     }
 
-    public static Key read(String keyPath) throws GeneralSecurityException, IOException {
-        System.out.println("Reading key from file " + keyPath + " ...");
-        FileInputStream fis = new FileInputStream(keyPath);
-        byte[] encoded = new byte[fis.available()];
-        fis.read(encoded);
-        fis.close();
+    public static KeyPair read(String publicKeyPath, String privateKeyPath) throws GeneralSecurityException, IOException {
+        System.out.println("Reading public key from file " + publicKeyPath + " ...");
+        FileInputStream pubFis = new FileInputStream(publicKeyPath);
+        byte[] pubEncoded = new byte[pubFis.available()];
+        pubFis.read(pubEncoded);
+        pubFis.close();
 
-        return new SecretKeySpec(encoded, "RSA");
+        X509EncodedKeySpec pubSpec = new X509EncodedKeySpec(pubEncoded);
+        KeyFactory keyFacPub = KeyFactory.getInstance("RSA");
+        PublicKey pub = keyFacPub.generatePublic(pubSpec);
+
+        System.out.println("Reading private key from file " + privateKeyPath + " ...");
+        FileInputStream privFis = new FileInputStream(privateKeyPath);
+        byte[] privEncoded = new byte[privFis.available()];
+        privFis.read(privEncoded);
+        privFis.close();
+
+        PKCS8EncodedKeySpec privSpec = new PKCS8EncodedKeySpec(privEncoded);
+        KeyFactory keyFacPriv = KeyFactory.getInstance("RSA");
+        PrivateKey priv = keyFacPriv.generatePrivate(privSpec);
+
+        KeyPair keys = new KeyPair(pub, priv);
+        return keys;
     }
-
 }
