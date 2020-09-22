@@ -413,7 +413,7 @@ $ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/o
 $ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
 ```
 
-How do you compare the results with EBC?
+How do you compare the results with ECB?
 
 Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. 
 A possibility is to use base 64 encoding that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
