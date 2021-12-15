@@ -354,19 +354,29 @@ user.crt: OK
 
 To read the generated keys in Java it is necessary to convert them to the right format.
 
-Convert the private key to PKCS8:
+Convert server.key to .pem
 
 ```bash
-$ openssl pkcs8 -topk8 -inform PEM -outform DER -in server.key -nocrypt > server\_pkcs8.key
+$ openssl rsa -in server.key -text > private_key.pem
+```
+
+Convert private Key to PKCS#8 format (so Java can read it)
+
+```bash
+$ openssl pkcs8 -topk8 -inform PEM -outform DER -in private_key.pem -out private_key.der -nocrypt
+```
+
+Output public key portion in DER format (so Java can read it)
+
+```bash
+$ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
 ```
 
 Read the key files using the following command:
 
 ```bash
-java RSAKeyGenerator r server\_pkcs8.key server.crt
+$ java RSAKeyGenerator r private_key.der public_key.der
 ```
-
-
 #### Generating a pair of keys with Java
 
 Generate a new pair of RSA Keys.
