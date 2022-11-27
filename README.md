@@ -37,9 +37,7 @@ For more information, please read:
 
 [http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#Introduction](http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#Introduction)
 
-
 ## Cryptographic mechanisms
-
 
 ### Setup
 
@@ -66,7 +64,6 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -D
 
 You can also modify the class and arguments directly in the pom.xml file.
 
-
 ### Alternative setup
 
 If Maven is not available, you can compile the code directly using the Java compiler:
@@ -85,14 +82,13 @@ $ export CLASSPATH="/tmp/JavaCrypto/src"
 
 Please notice that all steps that follow expect that this was done, so you must adjust paths commands, if necessary.
 
-For every java command that follows in this guide, please write the full package names and file paths. 
+For every java command that follows in this guide, please write the full package names and file paths.
 They are ommitted for brevity in this guide.
 
 ```bash
 $ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator 
 # instead of just $ java RandomImageGenerator
 ```
-
 
 ### Image files
 
@@ -103,15 +99,15 @@ In the directory intro/inputs, you can find three different images:
 - Tux: \*.png, Tux, the Linux penguin
 - Glider: \*.png, the hacker emblem ([http://www.catb.org/hacker-emblem/](http://www.catb.org/hacker-emblem/))
 
-Each one is presented with three different dimensions: 480x480, 960x960, and 2400x2400. 
-The resolution number is part of the file name. 
-The ImageMixer class is available to facilitate the operations on images. 
+Each one is presented with three different dimensions: 480x480, 960x960, and 2400x2400.
+The resolution number is part of the file name.
+The ImageMixer class is available to facilitate the operations on images.
 Different code examples are available, such as the RandomImageGenerator, ImageXor, and ImageAESCipher classes.
 
 ### One-Time Pads (Symmetric stream cipher)
 
-If they could be correctly used in practice, one-time pads would provide perfect security. 
-One of the constraints to make them work as expected is that the key stream must never be reused. 
+If they could be correctly used in practice, one-time pads would provide perfect security.
+One of the constraints to make them work as expected is that the key stream must never be reused.
 The following steps visually illustrate what happens if they are reused, even if just once:
 
 Generate a new 480x480 random image:
@@ -141,8 +137,8 @@ To make the differences obvious, XOR them together:
 $ java ImageXor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
 ```
 
-You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information. 
-The reason is the following:         
+You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information.
+The reason is the following:
 
 ```
 C1 = M1 ⊕ K
@@ -154,13 +150,12 @@ C1 ⊕ C2 = M1 ⊕ M2
 
 Legend: C stands for cipher-text, M for plain-text, K for key, ⊕ for XOR
 
-The result you get is the XOR of the images. 
+The result you get is the XOR of the images.
 You can experiment with other images and sizes.
-
 
 ### Block cipher modes
 
-Now that you know that keys should never be reused, remember that the way you use them is also important. 
+Now that you know that keys should never be reused, remember that the way you use them is also important.
 
 We will use a symmetric-key encryption algorithm working in blocks to encrypt the pixels from an image.
 We will use different modes, namely:
@@ -198,12 +193,12 @@ What is necessary to change in the code for that to happen?
 
 Repeat all the previous steps for the new key.
 
-Compare the results obtained using ECB mode with AES with the previous ones. 
+Compare the results obtained using ECB mode with AES with the previous ones.
 What are the differences between them?
 
 #### CBC (Cipher Block Chaining)
 
-In CBC mode, each block M[i] is XORed with the ciphertext from the previous block, and then encrypted with key k: 
+In CBC mode, each block M[i] is XORed with the ciphertext from the previous block, and then encrypted with key k:
 
 ```
 C[i] = E_k (M[i] ⊕ C[i-1])
@@ -211,7 +206,7 @@ C[i] = E_k (M[i] ⊕ C[i-1])
 
 ![CBC](CBC.png)
 
-The encryption of the first block can be performed by means of a random and unique value known as the _Initialization Vector_ (IV). 
+The encryption of the first block can be performed by means of a random and unique value known as the _Initialization Vector_ (IV).
 
 The AES key will be the same from the previous step.
 
@@ -221,10 +216,10 @@ Encrypt the glider image with it, this time replacing ECB with CBC:
 $ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
 ```
 
-Watch the file glider-aes-cbc.png. 
+Watch the file glider-aes-cbc.png.
 See the difference made by changing only the mode of operation.
 
-Still in the CBC mode, you might have wondered why the IV is needed in the first block. 
+Still in the CBC mode, you might have wondered why the IV is needed in the first block.
 Consider what happens when you encrypt two different images with similar beginnings, and with the same key: the initial cipher text blocks would also be similar!
 
 The ImageAESCipher class provided has been deliberately weakened: instead of randomizing the IV, it is always the same.
@@ -238,9 +233,8 @@ $ java ImageAESCipher intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC in
 ```
 
 Now watch the images glider-aes-cbc.png, tux-aes-cbc.png, and tecnico-aes-cbc.png.
-Look to the first lines of pixels. 
+Look to the first lines of pixels.
 Can you see what is going on?
-
 
 #### OFB
 
@@ -248,7 +242,7 @@ In the OFB mode, the IV is encrypted with the key to make a keystream that is th
 
 ![OFB](OFB.png)
 
-In practice, the keystream of the OFB mode can be seen as the one-time pad that is used to encrypt a message. 
+In practice, the keystream of the OFB mode can be seen as the one-time pad that is used to encrypt a message.
 This implies that in OFB mode, if the key and the IV are both reused, there is no security.
 
 Encrypt the images with OFB:
@@ -261,16 +255,15 @@ $ java ImageAESCipher intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/
 $ java ImageAESCipher intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png
 ```
 
-Remember that the ImageAESCipher implementation has been weakened, by having a null IV, and you are reusing the same AES key. 
+Remember that the ImageAESCipher implementation has been weakened, by having a null IV, and you are reusing the same AES key.
 Watch the generated images and switch quickly between them.
 
-Take two images (e.g., image1 and image2) and cipher them both. 
-XOR image1 with the ciphered image2. 
-What did you obtain? 
+Take two images (e.g., image1 and image2) and cipher them both.
+XOR image1 with the ciphered image2.
+What did you obtain?
 Why?
 
 What is more secure to use: CBC or OFB?
-
 
 ### Asymmetric ciphers
 
@@ -305,7 +298,7 @@ Self-sign:
 $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 ```
 
-For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a .srl file). 
+For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a .srl file).
 Create it:
 
 ```bash
@@ -377,6 +370,7 @@ Read the key files using the following command:
 ```bash
 $ java RSAKeyGenerator r private_key.der public_key.der
 ```
+
 #### Generating a pair of keys with Java
 
 Generate a new pair of RSA Keys.
@@ -390,12 +384,11 @@ Based on the ImageAESCipher class create ImageRSACipher and ImageRSADecipher cla
 Encrypt the image with the public key and then decrypt it with the private key.
 Try the same thing with the other images - especially with other sizes.
 
-Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key. 
-For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options. 
-This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small. 
-For large data, hybrid cipher is most suited (combining RSA with AES, for example). 
+Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key.
+For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options.
+This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small.
+For large data, hybrid cipher is most suited (combining RSA with AES, for example).
 For this exercise you can cipher one block at a time.
-
 
 ### Additional exercise (file tampering)
 
@@ -412,7 +405,7 @@ $ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/o
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
 (Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not perform actual cheating.)
 
-Did you succeed? 
+Did you succeed?
 Did your changes have side effects?
 
 Now try to attack cbc.aes and ofb.aes. For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
@@ -447,19 +440,16 @@ $ diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 
 It should not return anything.
 
-Check the difference on the file sizes. 
-Can you explain it? 
+Check the difference on the file sizes.
+Can you explain it?
 In percentage, how much is it?
 
-Does base 64 provide any kind of security? 
+Does base 64 provide any kind of security?
 If so, how?
 
-Use Java to generate the message authentication code (MAC) and digital signature of the grades file. 
+Use Java to generate the message authentication code (MAC) and digital signature of the grades file.
 By performing these operations, which security requirements can be guaranteed?
 
+----
 
-**Acknowledgments**
-
-Original version: Valmiky Arquissandas
-
-Revisions: Diogo Peres Castilho, David R. Matos, Miguel Pardal, Ricardo Chaves
+[SIRS Faculty](mailto:meic-sirs@disciplinas.tecnico.ulisboa.pt)
