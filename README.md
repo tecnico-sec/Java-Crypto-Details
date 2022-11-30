@@ -41,6 +41,12 @@ For more information, please read:
 
 ### Setup
 
+First, install Mavne:
+```bash
+$ sudo apt update
+$ sudo apt install maven
+```
+
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
 
 Put the lab files in a working folder with write permissions, like /tmp/JavaCrypto, for example, and change your working directory to it.
