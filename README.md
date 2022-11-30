@@ -11,7 +11,7 @@ Instituto Superior Técnico, Universidade de Lisboa
 
 ## Introduction
 
-This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux. The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication and access control.
+This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux. It is recommended to follow this assignment using the SeedsLabs virtual machine from previous classes. The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication and access control.
 
 The Java Cryptography Architecture (JCA), which is a major piece of the Java platform, includes a large set of application programming interfaces (APIs), tools, and implementations of commonly-used security algorithms, mechanisms, and protocols. It provides a comprehensive security framework for writing applications and also provides a set of tools to securely manage applications.
 
@@ -94,19 +94,19 @@ The following steps visually illustrate what happens if they are reused, even if
 Generate a new 480x480 random image:
 
 ```bash
-$ java RandomImageGenerator intro/outputs/otp.png 480 480
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
 ```
 
 Perform the bitwise eXclusive OR operation (XOR) with the generated key:
 
 ```bash
-$ java ImageXor intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png"
 ```
 
 XOR tux-0480.png with the same generated key:
 
 ```bash
-$ java ImageXor intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png"
 ```
 
 Watch the images encrypted-tecnico.png and encrypted-tux.png. 
@@ -115,7 +115,7 @@ Switch between them and see the differences.
 To make the differences obvious, XOR them together:
 
 ```bash
-$ java ImageXor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png"
 ```
 
 You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information.
@@ -155,13 +155,13 @@ C[i] = E_k(M[i])
 Begin by generating a new AES Key:
 
 ```bash
-$ java AESKeyGenerator w intro/outputs/aes.key
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.AESKeyGenerator -Dexec.args="w intro/outputs/aes.key"
 ```
 
 Then, encrypt the glider image with it:
 
 ```bash
-$ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png"
 ```
 
 Watch the output image. 
@@ -194,7 +194,7 @@ The AES key will be the same from the previous step.
 Encrypt the glider image with it, this time replacing ECB with CBC:
 
 ```bash
-$ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png"
 ```
 
 Watch the file glider-aes-cbc.png.
@@ -208,9 +208,9 @@ The ImageAESCipher class provided has been deliberately weakened: instead of ran
 This time, encrypt the other two images with AES/CBC, still using the same AES key:
 
 ```bash
-$ java ImageAESCipher intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png"
 
-$ java ImageAESCipher intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png"
 ```
 
 Now watch the images glider-aes-cbc.png, tux-aes-cbc.png, and tecnico-aes-cbc.png.
@@ -229,11 +229,11 @@ This implies that in OFB mode, if the key and the IV are both reused, there is n
 Encrypt the images with OFB:
 
 ```bash
-$ java ImageAESCipher intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png"
 
-$ java ImageAESCipher intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png"
 
-$ java ImageAESCipher intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png"
 ```
 
 Remember that the ImageAESCipher implementation has been weakened, by having a null IV, and you are reusing the same AES key.
@@ -349,7 +349,7 @@ $ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
 Read the key files using the following command:
 
 ```bash
-$ java RSAKeyGenerator r private_key.der public_key.der
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RSAKeyGenerator -Dexec.args="r private_key.der public_key.der"
 ```
 
 #### Generating a pair of keys with Java
@@ -357,7 +357,7 @@ $ java RSAKeyGenerator r private_key.der public_key.der
 Generate a new pair of RSA Keys.
 
 ```bash
-$ java RSAKeyGenerator w intro/outputs/priv.key intro/outputs/pub.key
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RSAKeyGenerator -Dexec.args="w intro/outputs/priv.key intro/outputs/pub.key"
 ```
 
 Based on the ImageAESCipher class create ImageRSACipher and ImageRSADecipher classes.
@@ -380,7 +380,7 @@ Begin by encrypting this file into ecb.aes.
 For this example, we will still reuse the AES key generated above and ECB mode.
 
 ```bash
-$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes"
 ```
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
@@ -392,9 +392,9 @@ Did your changes have side effects?
 Now try to attack cbc.aes and ofb.aes. For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
 
 ```bash
-$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes"
 
-$ java FileAESCipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes"
 ```
 
 How do you compare the results with ECB?
@@ -404,13 +404,13 @@ A possibility is to use base 64 encoding that, for every binary sequence of 6 bi
 Execute the following to create a base 64 representation of files previously generated.
 
 ```bash
-$ java Base64Encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Encode -Dexec.args="grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64"
 ```
 
 Decode them:
 
 ```bash
-$ java Base64Decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
+$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Decode -Dexec.args="grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded"
 ```
 
 Check if they are similar using the diff command (or fc /b command on Windows):
