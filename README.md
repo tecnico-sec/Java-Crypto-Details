@@ -71,32 +71,6 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -D
 
 You can also modify the class and arguments directly in the pom.xml file.
 
-### Alternative setup
-
-If Maven is not available, you can compile the code directly using the Java compiler:
-
-```bash
-$ javac src/pt/ulisboa/tecnico/meic/sirs/*.java
-```
-
-You will also need to define the Classpath environment variable. 
-The Classpath is a parameter that specifies the location of user-defined classes and packages
-(for .class files in a named package, the Classpath must end with the directory that contains the first package in the full package name).
-
-```bash
-$ export CLASSPATH="/tmp/JavaCrypto/src"
-```
-
-Please notice that all steps that follow expect that this was done, so you must adjust paths commands, if necessary.
-
-For every java command that follows in this guide, please write the full package names and file paths.
-They are ommitted for brevity in this guide.
-
-```bash
-$ java pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator 
-# instead of just $ java RandomImageGenerator
-```
-
 ### Image files
 
 The cryptographic operations will be applied to image files, so that its results can be "seen".
