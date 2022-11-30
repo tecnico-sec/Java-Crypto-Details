@@ -11,7 +11,7 @@ Instituto Superior Técnico, Universidade de Lisboa
 
 ## Introduction
 
-This laboratory assignment uses Java Development Kit (JDK) version 7 or later, running on Linux. The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication and access control.
+This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux. The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication and access control.
 
 The Java Cryptography Architecture (JCA), which is a major piece of the Java platform, includes a large set of application programming interfaces (APIs), tools, and implementations of commonly-used security algorithms, mechanisms, and protocols. It provides a comprehensive security framework for writing applications and also provides a set of tools to securely manage applications.
 
@@ -41,10 +41,11 @@ For more information, please read:
 
 ### Setup
 
-First, install Mavne:
+First, install Maven and javac:
 ```bash
 $ sudo apt update
 $ sudo apt install maven
+$ sudo apt install openjdk-11-jdk-headless
 ```
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
