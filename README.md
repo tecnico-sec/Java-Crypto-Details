@@ -45,7 +45,7 @@ First, install Maven and javac:
 ```bash
 $ sudo apt update
 $ sudo apt install maven
-$ sudo apt install openjdk-11-jdk-headless
+$ sudo apt install openjdk-11-jdk
 ```
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
