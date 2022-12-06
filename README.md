@@ -413,10 +413,10 @@ Decode them:
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Decode -Dexec.args="grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded"
 ```
 
-Check if they are similar using the diff command (or fc /b command on Windows):
+Check if they are similar using the cmp command (or fc /b command on Windows):
 
 ```bash
-$ diff grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
+$ cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 It should not return anything.
