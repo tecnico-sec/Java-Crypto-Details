@@ -50,10 +50,10 @@ $ sudo apt install openjdk-11-jdk
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
 
-Put the lab files in a working folder with write permissions, like /tmp/JavaCrypto, for example, and change your working directory to it.
+Put the lab files in a working folder with write permissions, like /tmp/Java-Crypto, for example, and change your working directory to it.
 
 ```bash
-$ cd /tmp/JavaCrypto 
+$ cd /tmp/Java-Crypto 
 ```
 
 You can compile the code using [Maven](https://maven.apache.org/).
