@@ -6,20 +6,29 @@ Instituto Superior Técnico, Universidade de Lisboa
 
 ## Goals
 
-- Use the cryptographic mechanisms available in the Java platform.
-- Perform attacks exploiting vulnerabilities introduced by the bad use of cryptography.
+- Use the cryptographic mechanisms available in the Java platform;
+- Perform attacks that exploit vulnerabilities introduced by the bad use of cryptography.
 
 ## Introduction
 
-This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux. It is recommended to follow this assignment using the SeedsLabs virtual machine from previous classes. The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication and access control.
+This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux.
+It is recommended that you follow this assignment using the SeedsLabs virtual machine from previous classes.
+The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication, and access control.
 
-The Java Cryptography Architecture (JCA), which is a major piece of the Java platform, includes a large set of application programming interfaces (APIs), tools, and implementations of commonly-used security algorithms, mechanisms, and protocols. It provides a comprehensive security framework for writing applications and also provides a set of tools to securely manage applications.
+The Java Cryptography Architecture (JCA), which is a major piece of the Java platform, includes a large set of application programming interfaces (APIs), tools, and implementations of commonly-used security algorithms, mechanisms, and protocols.
+It provides a comprehensive security framework for writing applications and also provides a set of tools to securely manage applications.
 
-The JCA APIs include abstractions for secure random number generation, key generation and management, certificates and certificate validation, encryption (symmetric/asymmetric block/stream ciphers), message digests (hashes), and digital signatures. Some examples are the MessageDigest, Signature, KeyFactory, KeyPairGenerator, and Cipher classes.
+The JCA APIs include abstractions for secure random number generation, key generation and management, certificates and certificate validation, encryption (symmetric/asymmetric block/stream ciphers), message digests (hashes), and digital signatures.
+Some examples are the `MessageDigest`, `Signature`, `KeyFactory`, `KeyPairGenerator`, and `Cipher` classes.
 
-Implementation independence, in the Java platform, is achieved using a _provider_-based architecture. The term Cryptographic Service Provider (CSP) refers to a package or set of packages that implement one or more cryptographic services, such as digital signature algorithms, message digest algorithms, and key conversion services. A program may simply request an object, e.g., a MessageDigest object, implementing a particular service, e.g., the SHA-256 digest algorithm, and get an implementation from one of the installed providers. A program may instead request, if necessary, an implementation from a specific provider.
+Implementation independence, in the Java platform, is achieved using a _provider_-based architecture.
+The term Cryptographic Service Provider (CSP) refers to a package or set of packages that implement one or more cryptographic services, such as digital signature algorithms, message digest algorithms, and key conversion services.
+A program may simply request an object, e.g., a `MessageDigest` object, implementing a particular service, e.g., the SHA-256 digest algorithm, and get an implementation from one of the installed providers.
+A program may instead request, if necessary, an implementation from a specific provider.
 
-To obtain a security service from an underlying provider, applications rely on the relevant getInstance() method. The message digest creation, for example, represents one type of service available from providers. To obtain an implementation of a specific message digest algorithm, an application invokes the getInstance() method in the java.security.MessageDigest class.
+To obtain a security service from an underlying provider, applications rely on the relevant `getInstance()` method.
+The message digest creation, for example, represents one type of service available from providers.
+To obtain an implementation of a specific message digest algorithm, an application invokes the `getInstance()` method in the [`java.security.MessageDigest` class](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/MessageDigest.html).
 
 ```java
 MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -31,17 +40,20 @@ Optionally, by indicating the provider name, the program may request an implemen
 MessageDigest md = MessageDigest.getInstance("SHA-256", "MyProvider");
 ```
 
-Providers may be updated transparently to the application when faster or more secure versions are available. In the Java platform, the java.security.Provider class is the base class for all security providers. Each CSP contains an instance of this class which contains the provider&#39;s name and lists all the security services/algorithms it implements. Multiple providers may be configured at the same time and are listed in order of preference. The highest priority provider that implements that service is selected when a security service is requested.
+Providers may be updated transparently to the application when faster or more secure versions are available.
+In the Java platform, the `java.security.Provider` class is the base class for all security providers.
+Each CSP contains an instance of this class which contains the provider's name and lists all the security services/algorithms it implements.
+Multiple providers may be configured at the same time and are listed in order of preference.
+The highest priority provider that implements that service is selected when a security service is requested.
 
-For more information, please read:
-
-[http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#Introduction](http://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html#Introduction)
+For more information, please read the [Java Cryptography Architecture (JCA) Reference Guide](https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190).
 
 ## Cryptographic mechanisms
 
 ### Setup
 
-First, install Maven and javac:
+First, install Maven and the Java compiler:
+
 ```bash
 $ sudo apt update
 $ sudo apt install maven
@@ -50,7 +62,7 @@ $ sudo apt install openjdk-11-jdk
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
 
-Put the lab files in a working folder with write permissions, like /tmp/Java-Crypto, for example, and change your working directory to it.
+Put the lab files in a working folder with write permissions, like `/tmp/Java-Crypto`, for example, and change your working directory to it:
 
 ```bash
 $ cd /tmp/Java-Crypto 
@@ -69,21 +81,21 @@ To execute a class with arguments using Maven, write something like:
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
 ```
 
-You can also modify the class and arguments directly in the pom.xml file.
+You can also modify the class and arguments directly in the `pom.xml` file.
 
 ### Image files
 
 The cryptographic operations will be applied to image files, so that its results can be "seen".
-In the directory intro/inputs, you can find three different images:
+In the directory `intro/inputs`, you can find three different images:
 
-- Tecnico: \*.png, the IST logo
-- Tux: \*.png, Tux, the Linux penguin
-- Glider: \*.png, the hacker emblem ([http://www.catb.org/hacker-emblem/](http://www.catb.org/hacker-emblem/))
+- Tecnico: \*.png, the IST logo;
+- Tux: \*.png, Tux, the Linux penguin;
+- Glider: \*.png, the hacker emblem ([http://www.catb.org/hacker-emblem/](http://www.catb.org/hacker-emblem/)).
 
 Each one is presented with three different dimensions: 480x480, 960x960, and 2400x2400.
 The resolution number is part of the file name.
-The ImageMixer class is available to facilitate the operations on images.
-Different code examples are available, such as the RandomImageGenerator, ImageXor, and ImageAESCipher classes.
+The `ImageMixer` class is available to facilitate the operations on images.
+Different code examples are available, such as the `RandomImageGenerator`, `ImageXor`, and `ImageAESCipher` classes.
 
 ### One-Time Pads (Symmetric stream cipher)
 
@@ -109,9 +121,8 @@ XOR tux-0480.png with the same generated key:
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png"
 ```
 
-Watch the images encrypted-tecnico.png and encrypted-tux.png. 
-Switch between them and see the differences.
-
+Watch the images encrypted-tecnico.png and encrypted-tux.png.  
+Switch between them and see the differences.  
 To make the differences obvious, XOR them together:
 
 ```bash
@@ -197,13 +208,13 @@ Encrypt the glider image with it, this time replacing ECB with CBC:
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png"
 ```
 
-Watch the file glider-aes-cbc.png.
+Watch the file `glider-aes-cbc.png`.  
 See the difference made by changing only the mode of operation.
 
-Still in the CBC mode, you might have wondered why the IV is needed in the first block.
+Still in the CBC mode, you may have wondered why the IV is needed in the first block.
 Consider what happens when you encrypt two different images with similar beginnings, and with the same key: the initial cipher text blocks would also be similar!
 
-The ImageAESCipher class provided has been deliberately weakened: instead of randomizing the IV, it is always the same.
+The `ImageAESCipher` class provided has been deliberately weakened: instead of randomizing the IV, it is always the same.
 
 This time, encrypt the other two images with AES/CBC, still using the same AES key:
 
@@ -213,7 +224,7 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.a
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png"
 ```
 
-Now watch the images glider-aes-cbc.png, tux-aes-cbc.png, and tecnico-aes-cbc.png.
+Now watch the images `glider-aes-cbc.png`, `tux-aes-cbc.png`, and `tecnico-aes-cbc.png`.
 Look to the first lines of pixels.
 Can you see what is going on?
 
@@ -236,7 +247,7 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.a
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png"
 ```
 
-Remember that the ImageAESCipher implementation has been weakened, by having a null IV, and you are reusing the same AES key.
+Remember that the `ImageAESCipher` implementation has been weakened, by having a null IV, and you are reusing the same AES key.  
 Watch the generated images and switch quickly between them.
 
 Take two images (e.g., image1 and image2) and cipher them both.
@@ -279,20 +290,22 @@ Self-sign:
 $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 ```
 
-For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a .srl file).
+For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a `.srl` file).
 Create it:
 
 ```bash
 $ echo 01 > server.srl
 ```
 
-Then, generating a key for a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by (Note that the server and user common names must be different):
+Then, generating a key for a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
 
 ```bash
 $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
 ```
 
-Sign the file grades.txt with the user certificate:
+Note that the server and user common names must be different.
+
+Sign the file `grades.txt` with the user certificate:
 
 ```bash
 $ openssl dgst -sha256 grades/inputs/grades.txt > grades.sha256
@@ -328,19 +341,19 @@ user.crt: OK
 
 To read the generated keys in Java it is necessary to convert them to the right format.
 
-Convert server.key to .pem
+Convert `server.key` to the `.pem` format:
 
 ```bash
 $ openssl rsa -in server.key -text > private_key.pem
 ```
 
-Convert private Key to PKCS#8 format (so Java can read it)
+Convert private Key to PKCS#8 format (so the Java library can read it):
 
 ```bash
 $ openssl pkcs8 -topk8 -inform PEM -outform DER -in private_key.pem -out private_key.der -nocrypt
 ```
 
-Output public key portion in DER format (so Java can read it)
+Output public key portion in `.der` format (so Java can read it):
 
 ```bash
 $ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
@@ -360,36 +373,38 @@ Generate a new pair of RSA Keys.
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RSAKeyGenerator -Dexec.args="w intro/outputs/priv.key intro/outputs/pub.key"
 ```
 
-Based on the ImageAESCipher class create ImageRSACipher and ImageRSADecipher classes.
+Based on the `ImageAESCipher` class create `ImageRSACipher` and `ImageRSADecipher` classes.
 
 Encrypt the image with the public key and then decrypt it with the private key.
 Try the same thing with the other images - especially with other sizes.
 
 Please consider that the RSA cipher, as implemented by Java, can only be applied to one block of data at a time, and its size depends on the size of the key.
-For a 1024-bit key the block size is 117 bytes or 60 bytes, depending on the padding options.
+For a 1024-bit key, the block size is 117 bytes or 60 bytes, depending on the padding options.
 This is acceptable because the RSA cipher is mostly used to cipher keys or hashes that are small.
-For large data, hybrid cipher is most suited (combining RSA with AES, for example).
+For large data, hybrid cipher is most suited, combining RSA with AES, for example.
 For this exercise you can cipher one block at a time.
 
 ### Additional exercise (file tampering)
 
-In the directory grades/inputs, you can find the file grades.txt, the plaintext of a file with the grades of a course.
-This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade. Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on par with the rest of your class because you studied for a different exam...
+In the directory `grades/inputs`, you can find the file `grades.txt`, the plaintext of a file with the grades of a course.
+This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade.
+Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on par with the rest of your class because you studied for a different exam...
 
-Begin by encrypting this file into ecb.aes. 
+Begin by encrypting this file into the `ecb.aes` file. 
 For this example, we will still reuse the AES key generated above and ECB mode.
 
 ```bash
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes"
 ```
 
-Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.
+Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.  
 (Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not perform actual cheating.)
 
 Did you succeed?
 Did your changes have side effects?
 
-Now try to attack cbc.aes and ofb.aes. For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
+Now try to attack `cbc.aes` and `ofb.aes`.
+For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
 
 ```bash
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes"
@@ -400,8 +415,8 @@ $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.ar
 How do you compare the results with ECB?
 
 Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. 
-A possibility is to use base 64 encoding that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
-Execute the following to create a base 64 representation of files previously generated.
+A possibility is to use [Base 64 Encoding](https://en.wikipedia.org/wiki/Base64) that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
+Execute the following to create a Base 64 representation of files previously generated.
 
 ```bash
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Encode -Dexec.args="grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64"
@@ -413,7 +428,7 @@ Decode them:
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Decode -Dexec.args="grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded"
 ```
 
-Check if they are similar using the cmp command (or fc /b command on Windows):
+Check if they are similar using the `cmp` command (or `fc /b` command on Windows):
 
 ```bash
 $ cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
@@ -425,7 +440,7 @@ Check the difference on the file sizes.
 Can you explain it?
 In percentage, how much is it?
 
-Does base 64 provide any kind of security?
+Does Base 64 provide any kind of security?
 If so, how?
 
 Use Java to generate the message authentication code (MAC) and digital signature of the grades file.
