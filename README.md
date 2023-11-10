@@ -337,6 +337,21 @@ $ openssl verify -CAfile server.crt user.crt
 
 user.crt: OK
 
+**NOTE:** rsautl is deprecated, you may use instead pkeyutl as follows.
+```shell
+$ openssl pkeyutl -sign -inkey user.key -keyform PEM -in grades.sha256 -out grades.sig
+
+$ openssl rsa -pubout -in user.key -out user.pub
+
+$ openssl pkeyutl -verify -pubin -inkey user.pub -sigfile grades.sig -in grades.sha256
+Signature Verified Successfully
+```
+
+**NOTE:** `openssl dgst -sha256` command by default outputs the hash in a human-readable format which includes the hash type and filename, not just the raw hash data. `openssl rsautl -sign` command expects only the raw binary hash data for signing. `-binary` flag with `openssl dgst` outputs the hash in a binary format that is suitable for the signing operation.
+```shell
+openssl dgst -sha256 -binary grades/inputs/grades.txt > intro/outputs/grades.sha256
+```
+
 #### Reading the generated pair of keys with Java
 
 To read the generated keys in Java it is necessary to convert them to the right format.

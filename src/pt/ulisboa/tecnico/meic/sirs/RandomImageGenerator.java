@@ -12,7 +12,7 @@ public class RandomImageGenerator {
             return;
         }
 
-        ImageMixer.createRandomImage(args[0], new Integer(args[1]), new Integer(args[2]));
+        ImageMixer.createRandomImage(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
     }
 
 }

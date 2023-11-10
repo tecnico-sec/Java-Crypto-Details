@@ -92,7 +92,7 @@
 				</executions>
 				<configuration>
 					<!-- to prevent deprecation warning: -->
-					<killAfter>-1</killAfter>
+					<!-- <killAfter>-1</killAfter> -->
 					<mainClass>${mainclass}</mainClass>
 					<arguments>
 						<!-- can be defined here with multiple argument tags, 
