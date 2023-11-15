@@ -10,9 +10,9 @@ public class ImageAESCipher {
 
     public static void main(String[] args) throws IOException {
 
-        if(args.length != 4) {
+        if(args.length < 4) {
             System.err.println("This program encrypts an image file with AES.");
-            System.err.println("Usage: ImageAESCipher [inputFile.png] [AESKeyFile] [ECB|CBC|OFB] [outputFile.png]");
+            System.err.println("Usage: image-aes-cipher [inputFile.png] [AESKeyFile] [ECB|CBC|OFB] [outputFile.png]");
             return;
         }
 

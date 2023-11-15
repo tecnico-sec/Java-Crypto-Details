@@ -7,10 +7,11 @@ import java.io.IOException;
  * Encode a file with Base64
  */
 public class Base64Encode {
+
     public static void main(String[] args) throws IOException {
-        if (args.length != 2) {
+        if (args.length < 2) {
             System.out.println("This program encodes a file with base64.");
-            System.out.println("Usage: Base64Encode <inputFile> <outputFile>");
+            System.out.println("Usage: base64-encode <inputFile> <outputFile>");
             return;
         }
 

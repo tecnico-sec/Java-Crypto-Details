@@ -15,8 +15,8 @@ public class AESKeyGenerator {
     public static void main(String[] args) throws Exception {
 
         // check args
-        if (args.length != 2) {
-            System.err.println("Usage: AESKeyGenerator [r|w] <key-file>");
+        if (args.length < 2) {
+            System.err.println("Usage: aes-key-gen [r|w] <key-file>");
             return;
         }
 

@@ -9,9 +9,9 @@ public class ImageXor {
 
     public static void main(String[] args) throws IOException {
 
-        if (args.length != 3) {
+        if (args.length < 3) {
             System.out.println("This program XORs two b/w image files.");
-            System.out.println("Usage: imageXOR <inputFile1.png> <inputFile2.png> <outputFile.png>");
+            System.out.println("Usage: image-xor <inputFile1.png> <inputFile2.png> <outputFile.png>");
             return;
         }
 

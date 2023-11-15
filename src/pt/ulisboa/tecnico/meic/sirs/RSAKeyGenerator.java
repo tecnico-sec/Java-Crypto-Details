@@ -14,8 +14,8 @@ public class RSAKeyGenerator {
     public static void main(String[] args) throws Exception {
 
         // check args
-        if (args.length != 3) {
-            System.err.println("Usage: RSAKeyGenerator [r|w] <priv-key-file> <pub-key-file>");
+        if (args.length < 3) {
+            System.err.println("Usage: rsa-key-gen [r|w] <priv-key-file> <pub-key-file>");
             return;
         }
 

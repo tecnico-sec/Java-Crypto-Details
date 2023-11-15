@@ -7,11 +7,12 @@ import java.io.IOException;
  * Decrypts a file with the AES algorithm in multiple modes, with a given, appropriate AES key
  */
 public class FileAESDecipher {
+
     public static void main(String[] args) throws IOException {
 
-        if(args.length != 4) {
+        if(args.length < 4) {
             System.err.println("This program decrypts a file with AES.");
-            System.err.println("Usage: FileAESDecipher [inputFile] [AESKeyFile] [ECB|CBC|OFB] [outputFile]");
+            System.err.println("Usage: file-aes-decipher [inputFile] [AESKeyFile] [ECB|CBC|OFB] [outputFile]");
             return;
         }
 

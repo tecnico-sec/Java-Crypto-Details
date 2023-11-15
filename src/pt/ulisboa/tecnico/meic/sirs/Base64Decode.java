@@ -8,10 +8,11 @@ import java.nio.charset.StandardCharsets;
  * Decode a file with Base64
  */
 public class Base64Decode {
+
     public static void main(String[] args) throws IOException {
-        if (args.length != 2) {
+        if (args.length < 2) {
             System.out.println("This program decodes a file with base64.");
-            System.out.println("Usage: Base64Decode <inputFile> <outputFile>");
+            System.out.println("Usage: base64-decode <inputFile> <outputFile>");
             return;
         }
 

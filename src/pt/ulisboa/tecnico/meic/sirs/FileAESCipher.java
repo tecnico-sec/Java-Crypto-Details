@@ -10,9 +10,9 @@ public class FileAESCipher {
 
     public static void main(String[] args) throws IOException {
 
-        if(args.length != 4) {
+        if(args.length < 4) {
             System.err.println("This program encrypts a file with AES.");
-            System.err.println("Usage: FileAESCipher [inputFile] [AESKeyFile] [ECB|CBC|OFB] [outputFile]");
+            System.err.println("Usage: file-aes-cipher [inputFile] [AESKeyFile] [ECB|CBC|OFB] [outputFile]");
             return;
         }
 
