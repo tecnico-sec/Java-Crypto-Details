@@ -2,19 +2,24 @@ Instituto Superior Técnico, Universidade de Lisboa
 
 **Network and Computer Security**
 
-# Lab guide: Java Cryptographic Mechanisms
+# Lab guide: Java Cryptographic Subtleties
 
-## Goals
+Cryptography is more complex than just using certain functions; it is a field where details matter greatly.
+Selecting the right algorithm and key size, and correctly applying encryption modes, are crucial for real security.
+Small mistakes in these areas can lead to vulnerabilities.
 
-- Use the cryptographic mechanisms available in the Java platform;
+This lab guide emphasizes understanding security vulnerabilities and best practices in cryptographic implementations.
+It starts with a quick review of the Java Cryptography Architecture (JCA), covering essential cryptographic concepts like secure random number generation, key management, and encryption techniques.
+Through exercises, it explores symmetric and asymmetric encryption, block cipher modes (including ECB, CBC, and OFB), digital signatures with OpenSSL, and a file tampering exercise.
+
+The goals are:
+
+- Correctly use the cryptographic mechanisms available in the Java platform;
 - Perform attacks that exploit vulnerabilities introduced by the bad use of cryptography.
 
-## Introduction
+## Cryptography in the Java Platform
 
-This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux.
-It is recommended that you follow this assignment using the SeedsLabs virtual machine from previous classes.
-The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication, and access control.
-
+The Java platform strongly emphasizes security, including language safety, cryptography, public key infrastructure, secure communication, authentication, and access control.  
 The Java Cryptography Architecture (JCA), which is a major piece of the Java platform, includes a large set of application programming interfaces (APIs), tools, and implementations of commonly-used security algorithms, mechanisms, and protocols.
 It provides a comprehensive security framework for writing applications and also provides a set of tools to securely manage applications.
 
@@ -48,13 +53,15 @@ The highest priority provider that implements that service is selected when a se
 
 For more information, please read the [Java Cryptography Architecture (JCA) Reference Guide](https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html#GUID-2BCFDD85-D533-4E6C-8CE9-29990DEB0190).
 
-## Cryptographic mechanisms
+## Setup
 
-### Setup
+This laboratory assignment uses Java Development Kit (JDK) version 11 or later, running on Linux.  
+It is recommended that you follow this assignment using the virtual machine from previous classes.
 
-First, install Maven and the Java compiler:
+First, check if you have the Java compiler and Maven available.  
+If not, install Maven and the Java compiler:
 
-```bash
+```sh
 $ sudo apt update
 $ sudo apt install maven
 $ sudo apt install openjdk-11-jdk
@@ -62,77 +69,133 @@ $ sudo apt install openjdk-11-jdk
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
 
-Put the lab files in a working folder with write permissions, like `/tmp/Java-Crypto`, for example, and change your working directory to it:
+Put the lab files in a working folder with write permissions, like `/tmp/crypto`, for example, and change your working directory to it:
 
-```bash
-$ cd /tmp/Java-Crypto 
+```sh
+$ cd /tmp/crypto 
 ```
 
 You can compile the code using [Maven](https://maven.apache.org/).
 To do so:
 
-```bash
+```sh
 $ mvn clean compile
 ```
 
+<!--
 To execute a class with arguments using Maven, write something like:
 
-```bash
+```sh
 $ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
 ```
 
 You can also modify the class and arguments directly in the `pom.xml` file.
+-->
+
+To compile everything and generate convenient scripts for running each class:
+
+```sh
+$ mvn install
+```
+
+The commands include:
+
+- `aes-key-gen`, a utility for generating AES keys;
+- `base64-decode`, decodes Base64 encoded data;
+- `base64-encode`, for encoding data into Base64 format;
+- `file-aes-cipher`, applies AES Cipher to files;
+- `file-aes-decipher`, used for deciphering files encrypted with AES;
+- `image-aes-cipher`, encrypts images using AES Cipher;
+- `image-xor`, applies the XOR operation on images;
+- `random-image-gen`, a tool for creating random images; and
+- `rsa-key-gen`, which generates RSA keys.
+
+These commands are generated in `target/appassembler/bin`.  
+Let us add this folder to the current `PATH` environment variable, so we can call the commands in any directory.
+
+The following commands find the absolute path of the work directory, export the variable for the current session, and test one of the commands:
+
+```sh
+$ pwd
+
+$ export PATH=$PATH:/tmp/crypto/target/appassembler/bin
+
+$ image-xor
+```
+
+Adjust `/tmp/crypto` to the directory you are actually using.  
+The `image-xor` command should be recognized and print information about the missing parameters.
+
+The following commands are the Windows CMD equivalent:
+
+```cmd
+cd
+
+set PATH=%PATH%;C:\tmp\crypto\target\appassembler\bin
+
+image-xor
+```
+
+<!--
+```powersh
+Get-Location
+
+$env:PATH += ";C:\tmp\crypto\target\appassembler\bin"
+
+image-xor
+```
+-->
 
 ### Image files
 
 The cryptographic operations will be applied to image files, so that its results can be "seen".
 In the directory `intro/inputs`, you can find three different images:
 
-- Tecnico: \*.png, the IST logo;
+- Técnico: \*.png, the IST logo;
 - Tux: \*.png, Tux, the Linux penguin;
 - Glider: \*.png, the hacker emblem ([http://www.catb.org/hacker-emblem/](http://www.catb.org/hacker-emblem/)).
 
-Each one is presented with three different dimensions: 480x480, 960x960, and 2400x2400.
+Each one is presented with three different dimensions: `480x480`, `960x960`, and `2400x2400`.
 The resolution number is part of the file name.
 The `ImageMixer` class is available to facilitate the operations on images.
 Different code examples are available, such as the `RandomImageGenerator`, `ImageXor`, and `ImageAESCipher` classes.
 
-### One-Time Pads (Symmetric stream cipher)
+## One-Time Pads (Symmetric stream cipher)
 
 If they could be correctly used in practice, one-time pads would provide perfect security.
 One of the constraints to make them work as expected is that the key stream must never be reused.
 The following steps visually illustrate what happens if they are reused, even if just once:
 
-Generate a new 480x480 random image:
+Generate a new `480x480` random image:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
+```sh
+$ random-image-gen intro/outputs/otp.png 480 480
 ```
 
 Perform the bitwise eXclusive OR operation (XOR) with the generated key:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png"
+```sh
+$ image-xor intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png
 ```
 
 XOR tux-0480.png with the same generated key:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png"
+```sh
+$ image-xor intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png
 ```
 
-Watch the images encrypted-tecnico.png and encrypted-tux.png.  
+Watch the images `encrypted-tecnico.png` and `encrypted-tux.png`.  
 Switch between them and see the differences.  
 To make the differences obvious, XOR them together:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageXor -Dexec.args="intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png"
+```sh
+$ image-xor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
 ```
 
 You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information.
 The reason is the following:
 
-```
+```txt
 C1 = M1 ⊕ K
 
 C2 = M2 ⊕ K
@@ -145,7 +208,7 @@ Legend: C stands for cipher-text, M for plain-text, K for key, ⊕ for XOR
 The result you get is the XOR of the images.
 You can experiment with other images and sizes.
 
-### Block cipher modes
+## Block Cipher Modes
 
 Now that you know that keys should never be reused, remember that the way you use them is also important.
 
@@ -153,29 +216,29 @@ We will use a symmetric-key encryption algorithm working in blocks to encrypt th
 We will use different modes, namely:
 ECB (Electronic Code Book), CBC (Cipher Block Chaining) and OFB (Output FeedBack).
 
-#### ECB (Electronic Code Book)
+### ECB (Electronic Code Book)
 
 In the ECB mode, each block is independently encrypted with the key:
 
-```
+```txt
 C[i] = E_k(M[i])
 ```
 
-![ECB](ECB.png)
+[Visual representation of ECB mode](ECB.png)
 
 Begin by generating a new AES Key:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.AESKeyGenerator -Dexec.args="w intro/outputs/aes.key"
+```sh
+$ aes-key-gen w intro/outputs/aes.key
 ```
 
 Then, encrypt the glider image with it:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png"
+```sh
+$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png
 ```
 
-Watch the output image. 
+Watch the output image.  
 Remember what you have just done: encrypted the image with AES, using ECB mode, and a key you generated yourself.
 
 Try the same thing with the other images (especially with other sizes).
@@ -188,15 +251,15 @@ Repeat all the previous steps for the new key.
 Compare the results obtained using ECB mode with AES with the previous ones.
 What are the differences between them?
 
-#### CBC (Cipher Block Chaining)
+### CBC (Cipher Block Chaining)
 
 In CBC mode, each block M[i] is XORed with the ciphertext from the previous block, and then encrypted with key k:
 
-```
+```txt
 C[i] = E_k (M[i] ⊕ C[i-1])
 ```
 
-![CBC](CBC.png)
+[Visual representation of CBC mode](CBC.png)
 
 The encryption of the first block can be performed by means of a random and unique value known as the _Initialization Vector_ (IV).
 
@@ -204,8 +267,8 @@ The AES key will be the same from the previous step.
 
 Encrypt the glider image with it, this time replacing ECB with CBC:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png"
+```sh
+$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
 ```
 
 Watch the file `glider-aes-cbc.png`.  
@@ -218,88 +281,88 @@ The `ImageAESCipher` class provided has been deliberately weakened: instead of r
 
 This time, encrypt the other two images with AES/CBC, still using the same AES key:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png"
+```sh
+$ image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png
 
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png"
+$ image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png
 ```
 
 Now watch the images `glider-aes-cbc.png`, `tux-aes-cbc.png`, and `tecnico-aes-cbc.png`.
 Look to the first lines of pixels.
 Can you see what is going on?
 
-#### OFB
+### OFB (Output FeedBack)
 
 In the OFB mode, the IV is encrypted with the key to make a keystream that is then XORed with the plaintext to make the cipher text.
 
-![OFB](OFB.png)
+[Visual representation of OFB mode](OFB.png)
 
 In practice, the keystream of the OFB mode can be seen as the one-time pad that is used to encrypt a message.
 This implies that in OFB mode, if the key and the IV are both reused, there is no security.
 
 Encrypt the images with OFB:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png"
+```sh
+$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png
 
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png"
+$ image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png
 
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.ImageAESCipher -Dexec.args="intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png"
+$ image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png
 ```
 
 Remember that the `ImageAESCipher` implementation has been weakened, by having a null IV, and you are reusing the same AES key.  
 Watch the generated images and switch quickly between them.
 
 Take two images (e.g., image1 and image2) and cipher them both.
-XOR image1 with the ciphered image2.
+XOR image1 with the ciphered image2.  
 What did you obtain?
 Why?
 
 What is more secure to use: CBC or OFB?
 
-### Asymmetric ciphers
+## Asymmetric ciphers
 
 The goal now is to use asymmetric ciphers, with separate private and public keys.
 RSA is the most well known of these algorithms.
 
-#### Generating a pair of keys with OpenSSL
+### Generating a pair of keys with OpenSSL
 
 Generate the key pair:
 
-```bash
+```sh
 $ openssl genrsa -out server.key
 ```
 
 Save the public key:
 
-```bash
+```sh
 $ openssl rsa -in server.key -pubout > public.key
 ```
 
-#### Generating a self-signed certificate
+### Generating a self-signed certificate
 
 Create a Certificate Signing Request, using same key:
 
-```bash
+```sh
 $ openssl req -new -key server.key -out server.csr
 ```
 
 Self-sign:
 
-```bash
+```sh
 $ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
 ```
 
 For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a `.srl` file).
 Create it:
 
-```bash
+```sh
 $ echo 01 > server.srl
 ```
 
 Then, generating a key for a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
 
-```bash
+```sh
 $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
 ```
 
@@ -307,7 +370,7 @@ Note that the server and user common names must be different.
 
 Sign the file `grades.txt` with the user certificate:
 
-```bash
+```sh
 $ openssl dgst -sha256 grades/inputs/grades.txt > grades.sha256
 
 $ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 > grades.sig
@@ -315,30 +378,31 @@ $ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 > grades.s
 
 Verify the signature with the user key:
 
-```bash
+```sh
 $ openssl rsautl -verify -in grades.sig -inkey user.key
 
-SHA256(/tmp/sirs/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
+SHA256(/tmp/crypto/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
 ```
 
 and should always match this:
 
-```bash
+```sh
 $ openssl dgst -sha256 grades/inputs/grades.txt
 
-SHA256(/tmp/sirs/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
+SHA256(/tmp/crypto/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
 ```
 
 Verify the user certificate:
 
-```bash
+```sh
 $ openssl verify -CAfile server.crt user.crt
 ```
 
 user.crt: OK
 
-**NOTE:** rsautl is deprecated, you may use instead pkeyutl as follows.
-```shell
+**NOTE:** `rsautl` is deprecated, you may use instead `pkeyutl` as follows.
+
+```sh
 $ openssl pkeyutl -sign -inkey user.key -keyform PEM -in grades.sha256 -out grades.sig
 
 $ openssl rsa -pubout -in user.key -out user.pub
@@ -347,45 +411,48 @@ $ openssl pkeyutl -verify -pubin -inkey user.pub -sigfile grades.sig -in grades.
 Signature Verified Successfully
 ```
 
-**NOTE:** `openssl dgst -sha256` command by default outputs the hash in a human-readable format which includes the hash type and filename, not just the raw hash data. `openssl rsautl -sign` command expects only the raw binary hash data for signing. `-binary` flag with `openssl dgst` outputs the hash in a binary format that is suitable for the signing operation.
-```shell
+**NOTE:** the `openssl dgst -sha256` command by default outputs the hash in a human-readable format which includes the hash type and filename, not just the raw hash data.
+`openssl rsautl -sign` command expects only the raw binary hash data for signing.
+`-binary` flag with `openssl dgst` outputs the hash in a binary format that is suitable for the signing operation.
+
+```sh
 openssl dgst -sha256 -binary grades/inputs/grades.txt > intro/outputs/grades.sha256
 ```
 
-#### Reading the generated pair of keys with Java
+### Reading the generated pair of keys with Java
 
 To read the generated keys in Java it is necessary to convert them to the right format.
 
 Convert `server.key` to the `.pem` format:
 
-```bash
+```sh
 $ openssl rsa -in server.key -text > private_key.pem
 ```
 
 Convert private Key to PKCS#8 format (so the Java library can read it):
 
-```bash
+```sh
 $ openssl pkcs8 -topk8 -inform PEM -outform DER -in private_key.pem -out private_key.der -nocrypt
 ```
 
 Output public key portion in `.der` format (so Java can read it):
 
-```bash
+```sh
 $ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
 ```
 
 Read the key files using the following command:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RSAKeyGenerator -Dexec.args="r private_key.der public_key.der"
+```sh
+$ rsa-key-gen r private_key.der public_key.der
 ```
 
-#### Generating a pair of keys with Java
+### Generating a pair of keys with Java
 
 Generate a new pair of RSA Keys.
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RSAKeyGenerator -Dexec.args="w intro/outputs/priv.key intro/outputs/pub.key"
+```sh
+$ rsa-key-gen w intro/outputs/priv.key intro/outputs/pub.key
 ```
 
 Based on the `ImageAESCipher` class create `ImageRSACipher` and `ImageRSADecipher` classes.
@@ -399,7 +466,7 @@ This is acceptable because the RSA cipher is mostly used to cipher keys or hashe
 For large data, hybrid cipher is most suited, combining RSA with AES, for example.
 For this exercise you can cipher one block at a time.
 
-### Additional exercise (file tampering)
+## File tampering exercise
 
 In the directory `grades/inputs`, you can find the file `grades.txt`, the plaintext of a file with the grades of a course.
 This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade.
@@ -408,8 +475,8 @@ Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on 
 Begin by encrypting this file into the `ecb.aes` file. 
 For this example, we will still reuse the AES key generated above and ECB mode.
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes"
+```sh
+$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
 ```
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.  
@@ -421,45 +488,51 @@ Did your changes have side effects?
 Now try to attack `cbc.aes` and `ofb.aes`.
 For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes"
+```sh
+$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
 
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.FileAESCipher -Dexec.args="grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes"
+$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
 ```
 
 How do you compare the results with ECB?
 
-Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files. 
+Since the inputs and outputs of cryptographic mechanisms are byte arrays, in many occasions it is necessary to represent encrypted data in text files.  
 A possibility is to use [Base 64 Encoding](https://en.wikipedia.org/wiki/Base64) that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
 Execute the following to create a Base 64 representation of files previously generated.
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Encode -Dexec.args="grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64"
+```sh
+$ base64-encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
 ```
 
 Decode them:
 
-```bash
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.Base64Decode -Dexec.args="grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded"
+```sh
+$ base64-decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 Check if they are similar using the `cmp` command (or `fc /b` command on Windows):
 
-```bash
+```sh
 $ cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 It should not return anything.
 
-Check the difference on the file sizes.
+Check the difference on the file sizes.  
 Can you explain it?
 In percentage, how much is it?
 
-Does Base 64 provide any kind of security?
+Does Base 64 provide any kind of security?  
 If so, how?
 
 Use Java to generate the message authentication code (MAC) and digital signature of the grades file.
-By performing these operations, which security requirements can be guaranteed?
+By performing these operations, which security requirements can be guaranteed?  
+
+## Conclusion
+
+This lab guide provided further exploration of cryptographic and data processing tools in Java, including:
+one-time pads (symmetric stream cipher), block cipher modes (including ECB, CBC, and OFB), and asymmetric ciphers (focusing on RSA).  
+Additionally, it included a practical exercise on file tampering, demonstrating how encryption alone may not guarantee data integrity.
 
 ----
 
