@@ -1,13 +1,18 @@
 package pt.ulisboa.tecnico.meic.sirs;
 
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.*;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import static javax.xml.bind.DatatypeConverter.printHexBinary;
 
 public class RSAKeyGenerator {
 
@@ -36,11 +41,11 @@ public class RSAKeyGenerator {
 
     public static void write(String publicKeyPath, String privateKeyPath) throws GeneralSecurityException, IOException {
         // get an AES private key
-        System.out.println("Generating RSA key ..." );
+        System.out.println("Generating RSA key ...");
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(1024);
         KeyPair keys = keyGen.generateKeyPair();
-        
+
         System.out.println("Private Key:");
         PrivateKey privKey = keys.getPrivate();
         byte[] privKeyEncoded = privKey.getEncoded();
@@ -48,19 +53,20 @@ public class RSAKeyGenerator {
         System.out.println("Public Key:");
         PublicKey pubKey = keys.getPublic();
         byte[] pubKeyEncoded = pubKey.getEncoded();
-        System.out.println(printHexBinary(pubKeyEncoded));       
+        System.out.println(printHexBinary(pubKeyEncoded));
 
-        System.out.println("Writing Private key to '" + privateKeyPath + "' ..." );
+        System.out.println("Writing Private key to '" + privateKeyPath + "' ...");
         FileOutputStream privFos = new FileOutputStream(privateKeyPath);
         privFos.write(privKeyEncoded);
         privFos.close();
-        System.out.println("Writing Pubic key to '" + publicKeyPath + "' ..." );
+        System.out.println("Writing Pubic key to '" + publicKeyPath + "' ...");
         FileOutputStream pubFos = new FileOutputStream(publicKeyPath);
         pubFos.write(pubKeyEncoded);
-        pubFos.close();        
+        pubFos.close();
     }
 
-    public static KeyPair read(String publicKeyPath, String privateKeyPath) throws GeneralSecurityException, IOException {
+    public static KeyPair read(String publicKeyPath, String privateKeyPath)
+            throws GeneralSecurityException, IOException {
         System.out.println("Reading public key from file " + publicKeyPath + " ...");
         FileInputStream pubFis = new FileInputStream(publicKeyPath);
         byte[] pubEncoded = new byte[pubFis.available()];

@@ -1,13 +1,11 @@
 package pt.ulisboa.tecnico.meic.sirs;
 
-import java.io.IOException;
-
 /**
  * XORs two images
  */
 public class ImageXor {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
 
         if (args.length < 3) {
             System.out.println("This program XORs two b/w image files.");

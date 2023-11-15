@@ -1,14 +1,15 @@
 package pt.ulisboa.tecnico.meic.sirs;
 
-import javax.crypto.KeyGenerator;
-import javax.crypto.spec.SecretKeySpec;
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 
-import static javax.xml.bind.DatatypeConverter.printHexBinary;
+import javax.crypto.KeyGenerator;
+import javax.crypto.spec.SecretKeySpec;
 
 public class AESKeyGenerator {
 
@@ -36,16 +37,16 @@ public class AESKeyGenerator {
 
     public static void write(String keyPath) throws GeneralSecurityException, IOException {
         // get an AES private key
-        System.out.println("Generating AES key ..." );
+        System.out.println("Generating AES key ...");
         KeyGenerator keyGen = KeyGenerator.getInstance("AES");
         keyGen.init(128);
         Key key = keyGen.generateKey();
-        System.out.println( "Finish generating AES key" );
+        System.out.println("Finish generating AES key");
         byte[] encoded = key.getEncoded();
         System.out.println("Key:");
         System.out.println(printHexBinary(encoded));
 
-        System.out.println("Writing key to '" + keyPath + "' ..." );
+        System.out.println("Writing key to '" + keyPath + "' ...");
 
         FileOutputStream fos = new FileOutputStream(keyPath);
         fos.write(encoded);

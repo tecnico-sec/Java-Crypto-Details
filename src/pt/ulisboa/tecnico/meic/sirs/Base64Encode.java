@@ -1,14 +1,13 @@
 package pt.ulisboa.tecnico.meic.sirs;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
 
 /**
  * Encode a file with Base64
  */
 public class Base64Encode {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         if (args.length < 2) {
             System.out.println("This program encodes a file with base64.");
             System.out.println("Usage: base64-encode <inputFile> <outputFile>");
