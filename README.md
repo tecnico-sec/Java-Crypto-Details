@@ -2,7 +2,7 @@ Instituto Superior Técnico, Universidade de Lisboa
 
 **Network and Computer Security**
 
-# Lab guide: Java Cryptographic Subtleties
+# Lab guide: Java Cryptographic Details
 
 Cryptography is more complex than just using certain functions; it is a field where details matter greatly.
 Selecting the right algorithm and key size, and correctly applying encryption modes, are crucial for real security.
