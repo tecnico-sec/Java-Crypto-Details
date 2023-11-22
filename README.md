@@ -360,7 +360,7 @@ Create it:
 $ echo 01 > server.srl
 ```
 
-Then, generating a key for a user is basically repeating the same steps (see commands above), except that the self-sign no longer happens and is replaced by:
+Generate a key for a user by repeating the same steps (see commands above to produce `user.key` and `user.crt`), except that the self-sign no longer happens and is replaced by the following:
 
 ```sh
 $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
