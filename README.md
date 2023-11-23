@@ -481,6 +481,7 @@ $ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outp
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.  
 (Why 21 or all 20s? Because you are an _ethical hacker_ using your skills to show that the system is vulnerable, not perform actual cheating.)
+* For this exercise, it may be useful to inspect the file with a hex editor, such as `hexedit` (GUI), `hexdump` or `xxd`.
 
 Did you succeed?
 Did your changes have side effects?
