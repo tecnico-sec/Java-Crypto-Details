@@ -327,98 +327,84 @@ RSA is the most well known of these algorithms.
 
 ### Generating a pair of keys with OpenSSL
 
-Generate the key pair:
+Generate the key pair for the server:
 
 ```sh
 $ openssl genrsa -out server.key
 ```
 
-Save the public key:
+And for the user:
 
 ```sh
-$ openssl rsa -in server.key -pubout > public.key
+$ openssl genrsa -out user.key
 ```
 
 ### Generating a self-signed certificate
 
-Create a Certificate Signing Request, using same key:
+Create a Certificate Signing Request for the server, using its key (you can leave the parameters empty):
 
 ```sh
 $ openssl req -new -key server.key -out server.csr
 ```
 
+Create a configuration file for the certificate:
+
+```sh
+$ echo "[v3_ca]\nbasicConstraints = CA:TRUE" > server_cert_config.cnf
+```
+
 Self-sign:
 
 ```sh
-$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt -extfile server_cert_config.cnf -extensions v3_ca
 ```
-
-For our certificate to be able to sign other certificates, OpenSSL requires that a database exists (a `.srl` file).
-Create it:
+**NOTE**: Alternatively, since our configuration is very simple, we could immediately generate the certificate, skipping the creation of the CSR and the configuration file:
 
 ```sh
-$ echo 01 > server.srl
+$ openssl req -x509 -days 365 -key server.key -out server.crt -addext "basicConstraints=CA:TRUE"
 ```
 
-Generate a key for a user by repeating the same steps (see commands above to produce `user.key` and `user.crt`), except that the self-sign no longer happens and is replaced by the following:
+### Signing a certificate
+
+Generate a Certificate Signing Request for the user, using its key:
+
+```sh
+$ openssl req -new -key user.key -out user.csr
+```
+
+And sign it with the server's private key:
 
 ```sh
 $ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
 ```
 
-Note that the server and user common names must be different.
-
-Sign the file `grades.txt` with the user certificate:
-
-```sh
-$ openssl dgst -sha256 grades/inputs/grades.txt > grades.sha256
-
-$ openssl rsautl -sign -inkey user.key -keyform PEM -in grades.sha256 > grades.sig
-```
-
-Verify the signature with the user key:
-
-```sh
-$ openssl rsautl -verify -in grades.sig -inkey user.key
-
-SHA256(/tmp/crypto/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
-```
-
-and should always match this:
-
-```sh
-$ openssl dgst -sha256 grades/inputs/grades.txt
-
-SHA256(/tmp/crypto/grades/inputs/grades.txt)= 770ddfe97cd0e6d279b9ce780ff060554d8ccbe4b8eccaed364a8fc6e89fd34d
-```
-
-Verify the user certificate:
-
+Verify the user's certificate:
 ```sh
 $ openssl verify -CAfile server.crt user.crt
 ```
-
 user.crt: OK
 
-**NOTE:** `rsautl` is deprecated, you may use instead `pkeyutl` as follows.
+### Signing a file
+
+Create a digest of the `grades.txt` file:
+```sh
+$ openssl dgst -sha256 -binary grades/inputs/grades.txt > grades/outputs/grades.sha256
+```
+
+Sign the digest with the user's private key:
 
 ```sh
-$ openssl pkeyutl -sign -inkey user.key -keyform PEM -in grades.sha256 -out grades.sig
+$ openssl pkeyutl -sign -inkey user.key -in grades/outputs/grades.sha256 -out grades/outputs/grades.sig
+```
 
-$ openssl rsa -pubout -in user.key -out user.pub
+Verify the signature with the user's public key:
 
-$ openssl pkeyutl -verify -pubin -inkey user.pub -sigfile grades.sig -in grades.sha256
+```sh
+$ openssl pkeyutl -verify -inkey user.key -sigfile grades/outputs/grades.sig -in grades/outputs/grades.sha256
+```
 Signature Verified Successfully
-```
 
-**NOTE:** the `openssl dgst -sha256` command by default outputs the hash in a human-readable format which includes the hash type and filename, not just the raw hash data.
-`openssl rsautl -sign` command expects only the raw binary hash data for signing.
-`-binary` flag with `openssl dgst` outputs the hash in a binary format that is suitable for the signing operation.
-
-```sh
-openssl dgst -sha256 -binary grades/inputs/grades.txt > intro/outputs/grades.sha256
-```
-
+Try modifying the `grades.sha256` file and rerunning the verification to see what happens.
 ### Reading the generated pair of keys with Java
 
 To read the generated keys in Java it is necessary to convert them to the right format.
