@@ -499,7 +499,7 @@ $ cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 
 It should not return anything.
 
-Check the difference on the file sizes.  
+Check the difference on the file sizes between ```grades/outputs/grades.cbc.aes``` and ```grades/outputs/grades.cbc.aes.b64```.  
 Can you explain it?
 In percentage, how much is it?
 
