@@ -243,13 +243,7 @@ Remember what you have just done: encrypted the image with AES, using ECB mode, 
 
 Try the same thing with the other images (especially with other sizes).
 
-Try using Java providers to generate a new AES key.
-What is necessary to change in the code for that to happen?
-
-Repeat all the previous steps for the new key.
-
-Compare the results obtained using ECB mode with AES with the previous ones.
-What are the differences between them?
+**NOTE**: The observable visual encryption pattern emitted by ECB mode can be observered independently of the chosen security provider and the generated AES key as it is a consequence of its operational design.
 
 ### CBC (Cipher Block Chaining)
 
