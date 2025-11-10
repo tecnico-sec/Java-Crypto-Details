@@ -61,32 +61,32 @@ It is recommended that you follow this assignment using the virtual machine from
 First, check if you have the Java compiler and Maven available.  
 If not, install Maven and the Java compiler:
 
-```sh
-$ sudo apt update
-$ sudo apt install maven
-$ sudo apt install openjdk-11-jdk
+```bash
+sudo apt update
+sudo apt install maven
+sudo apt install openjdk-11-jdk
 ```
 
 To try the cryptographic mechanisms, the Java code needs to be compiled and executed.
 
 Put the lab files in a working folder with write permissions, like `/tmp/crypto`, for example, and change your working directory to it:
 
-```sh
-$ cd /tmp/crypto 
+```bash
+cd /tmp/crypto 
 ```
 
 You can compile the code using [Maven](https://maven.apache.org/).
 To do so:
 
-```sh
-$ mvn clean compile
+```bash
+mvn clean compile
 ```
 
 <!--
 To execute a class with arguments using Maven, write something like:
 
-```sh
-$ mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
+```bash
+mvn exec:java -Dmainclass=pt.ulisboa.tecnico.meic.sirs.RandomImageGenerator -Dexec.args="intro/outputs/otp.png 480 480"
 ```
 
 You can also modify the class and arguments directly in the `pom.xml` file.
@@ -94,8 +94,8 @@ You can also modify the class and arguments directly in the `pom.xml` file.
 
 To compile everything and generate convenient scripts for running each class:
 
-```sh
-$ mvn install
+```bash
+mvn install
 ```
 
 The commands include:
@@ -115,12 +115,12 @@ Let us add this folder to the current `PATH` environment variable, so we can cal
 
 The following commands find the absolute path of the work directory, export the variable for the current session, and test one of the commands:
 
-```sh
-$ pwd
+```bash
+pwd
 
-$ export PATH=$PATH:/tmp/crypto/target/appassembler/bin
+export PATH=$PATH:/tmp/crypto/target/appassembler/bin
 
-$ image-xor
+image-xor
 ```
 
 Adjust `/tmp/crypto` to the directory you are actually using.  
@@ -168,28 +168,28 @@ The following steps visually illustrate what happens if they are reused, even if
 
 Generate a new `480x480` random image:
 
-```sh
-$ random-image-gen intro/outputs/otp.png 480 480
+```bash
+random-image-gen intro/outputs/otp.png 480 480
 ```
 
 Perform the bitwise eXclusive OR operation (XOR) with the generated key:
 
-```sh
-$ image-xor intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png
+```bash
+image-xor intro/inputs/tecnico-0480.png intro/outputs/otp.png intro/outputs/encrypted-tecnico.png
 ```
 
 XOR tux-0480.png with the same generated key:
 
-```sh
-$ image-xor intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png
+```bash
+image-xor intro/inputs/tux-0480.png intro/outputs/otp.png intro/outputs/encrypted-tux.png
 ```
 
 Watch the images `encrypted-tecnico.png` and `encrypted-tux.png`.  
 Switch between them and see the differences.  
 To make the differences obvious, XOR them together:
 
-```sh
-$ image-xor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
+```bash
+image-xor intro/outputs/encrypted-tecnico.png intro/outputs/encrypted-tux.png intro/outputs/tecnico-tux.png
 ```
 
 You can see that the reuse of a one-time pad (or any stream cipher key at all) considerably weakens (or completely breaks) the security of the information.
@@ -228,14 +228,14 @@ C[i] = E_k(M[i])
 
 Begin by generating a new AES Key:
 
-```sh
-$ aes-key-gen w intro/outputs/aes.key
+```bash
+aes-key-gen w intro/outputs/aes.key
 ```
 
 Then, encrypt the glider image with it:
 
-```sh
-$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png
+```bash
+image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key ECB intro/outputs/glider-aes-ecb.png
 ```
 
 Watch the output image.  
@@ -261,8 +261,8 @@ The AES key will be the same from the previous step.
 
 Encrypt the glider image with it, this time replacing ECB with CBC:
 
-```sh
-$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
+```bash
+image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key CBC intro/outputs/glider-aes-cbc.png
 ```
 
 Watch the file `glider-aes-cbc.png`.  
@@ -275,10 +275,10 @@ The `ImageAESCipher` class provided has been deliberately weakened: instead of r
 
 This time, encrypt the other two images with AES/CBC, still using the same AES key:
 
-```sh
-$ image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png
+```bash
+image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key CBC intro/outputs/tux-aes-cbc.png
 
-$ image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png
+image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key CBC intro/outputs/tecnico-aes-cbc.png
 ```
 
 Now watch the images `glider-aes-cbc.png`, `tux-aes-cbc.png`, and `tecnico-aes-cbc.png`.
@@ -296,12 +296,12 @@ This implies that in OFB mode, if the key and the IV are both reused, there is n
 
 Encrypt the images with OFB:
 
-```sh
-$ image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png
+```bash
+image-aes-cipher intro/inputs/glider-0480.png intro/outputs/aes.key OFB intro/outputs/glider-aes-ofb.png
 
-$ image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png
+image-aes-cipher intro/inputs/tux-0480.png intro/outputs/aes.key OFB intro/outputs/tux-aes-ofb.png
 
-$ image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png
+image-aes-cipher intro/inputs/tecnico-0480.png intro/outputs/aes.key OFB intro/outputs/tecnico-aes-ofb.png
 ```
 
 Remember that the `ImageAESCipher` implementation has been weakened, by having a null IV, and you are reusing the same AES key.  
@@ -323,78 +323,78 @@ RSA is the most well known of these algorithms.
 
 Generate the key pair for the server:
 
-```sh
-$ openssl genrsa -out server.key
+```bash
+openssl genrsa -out server.key
 ```
 
 And for the user:
 
-```sh
-$ openssl genrsa -out user.key
+```bash
+openssl genrsa -out user.key
 ```
 
 ### Generating a self-signed certificate
 
 Create a Certificate Signing Request for the server, using its key (you can leave the parameters empty):
 
-```sh
-$ openssl req -new -key server.key -out server.csr
+```bash
+openssl req -new -key server.key -out server.csr
 ```
 
 Create a configuration file for the certificate:
 
-```sh
-$ echo "[v3_ca]\nbasicConstraints = CA:TRUE" > server_cert_config.cnf
+```bash
+echo "[v3_ca]\nbasicConstraints = CA:TRUE" > server_cert_config.cnf
 ```
 
 Self-sign:
 
-```sh
-$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt -extfile server_cert_config.cnf -extensions v3_ca
+```bash
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt -extfile server_cert_config.cnf -extensions v3_ca
 ```
 **NOTE**: Alternatively, since our configuration is very simple, we could immediately generate the certificate, skipping the creation of the CSR and the configuration file:
 
-```sh
-$ openssl req -x509 -days 365 -key server.key -out server.crt -addext "basicConstraints=CA:TRUE"
+```bash
+openssl req -x509 -days 365 -key server.key -out server.crt -addext "basicConstraints=CA:TRUE"
 ```
 
 ### Signing a certificate
 
 Generate a Certificate Signing Request for the user, using its key:
 
-```sh
-$ openssl req -new -key user.key -out user.csr
+```bash
+openssl req -new -key user.key -out user.csr
 ```
 
 And sign it with the server's private key:
 
-```sh
-$ openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
+```bash
+openssl x509 -req -days 365 -in user.csr -CA server.crt -CAkey server.key -out user.crt
 ```
 
 Verify the user's certificate:
-```sh
-$ openssl verify -CAfile server.crt user.crt
+```bash
+openssl verify -CAfile server.crt user.crt
 ```
 user.crt: OK
 
 ### Signing a file
 
 Create a digest of the `grades.txt` file:
-```sh
-$ openssl dgst -sha256 -binary grades/inputs/grades.txt > grades/outputs/grades.sha256
+```bash
+openssl dgst -sha256 -binary grades/inputs/grades.txt > grades/outputs/grades.sha256
 ```
 
 Sign the digest with the user's private key:
 
-```sh
-$ openssl pkeyutl -sign -inkey user.key -in grades/outputs/grades.sha256 -out grades/outputs/grades.sig
+```bash
+openssl pkeyutl -sign -inkey user.key -in grades/outputs/grades.sha256 -out grades/outputs/grades.sig
 ```
 
 Verify the signature with the user's public key:
 
-```sh
-$ openssl pkeyutl -verify -inkey user.key -sigfile grades/outputs/grades.sig -in grades/outputs/grades.sha256
+```bash
+openssl pkeyutl -verify -inkey user.key -sigfile grades/outputs/grades.sig -in grades/outputs/grades.sha256
 ```
 Signature Verified Successfully
 
@@ -405,34 +405,34 @@ To read the generated keys in Java it is necessary to convert them to the right 
 
 Convert `server.key` to the `.pem` format:
 
-```sh
-$ openssl rsa -in server.key -text > private_key.pem
+```bash
+openssl rsa -in server.key -text > private_key.pem
 ```
 
 Convert private Key to PKCS#8 format (so the Java library can read it):
 
-```sh
-$ openssl pkcs8 -topk8 -inform PEM -outform DER -in private_key.pem -out private_key.der -nocrypt
+```bash
+openssl pkcs8 -topk8 -inform PEM -outform DER -in private_key.pem -out private_key.der -nocrypt
 ```
 
 Output public key portion in `.der` format (so Java can read it):
 
-```sh
-$ openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
+```bash
+openssl rsa -in private_key.pem -pubout -outform DER -out public_key.der
 ```
 
 Read the key files using the following command:
 
-```sh
-$ rsa-key-gen r private_key.der public_key.der
+```bash
+rsa-key-gen r private_key.der public_key.der
 ```
 
 ### Generating a pair of keys with Java
 
 Generate a new pair of RSA Keys.
 
-```sh
-$ rsa-key-gen w intro/outputs/priv.key intro/outputs/pub.key
+```bash
+rsa-key-gen w intro/outputs/priv.key intro/outputs/pub.key
 ```
 
 Based on the `ImageAESCipher` class create `ImageRSACipher` and `ImageRSADecipher` classes.
@@ -455,8 +455,8 @@ Unfortunately, you happen to be _Mr. Thomas S. Cook_, and your grade was not on 
 Begin by encrypting this file into the `ecb.aes` file. 
 For this example, we will still reuse the AES key generated above and ECB mode.
 
-```sh
-$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
+```bash
+file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key ECB grades/outputs/grades.ecb.aes
 ```
 
 Keeping in mind how the mode operations work, and without using the secret key, try to change your grade to 21 in the encrypted files or give everyone in class a 20.  
@@ -469,10 +469,10 @@ Did your changes have side effects?
 Now try to attack `cbc.aes` and `ofb.aes`.
 For this example, we will still reuse the AES key generated above but use the CBC and OFB modes.
 
-```sh
-$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
+```bash
+file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key CBC grades/outputs/grades.cbc.aes
 
-$ file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
+file-aes-cipher grades/inputs/grades.txt intro/outputs/aes.key OFB grades/outputs/grades.ofb.aes
 ```
 
 How do you compare the results with ECB?
@@ -481,20 +481,20 @@ Since the inputs and outputs of cryptographic mechanisms are byte arrays, in man
 A possibility is to use [Base 64 Encoding](https://en.wikipedia.org/wiki/Base64) that, for every binary sequence of 6 bits, assigns a predefined ASCII character.
 Execute the following to create a Base 64 representation of files previously generated.
 
-```sh
-$ base64-encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
+```bash
+base64-encode grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64
 ```
 
 Decode them:
 
-```sh
-$ base64-decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
+```bash
+base64-decode grades/outputs/grades.cbc.aes.b64 grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 Check if they are similar using the `cmp` command (or `fc /b` command on Windows):
 
-```sh
-$ cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
+```bash
+cmp grades/outputs/grades.cbc.aes grades/outputs/grades.cbc.aes.b64.decoded
 ```
 
 It should not return anything.
