@@ -394,7 +394,7 @@ openssl pkeyutl -sign -inkey user.key -in grades/outputs/grades.sha256 -out grad
 Verify the signature with the user's public key:
 
 ```bash
-openssl pkeyutl -verify -inkey user.key -sigfile grades/outputs/grades.sig -in grades/outputs/grades.sha256
+openssl pkeyutl -verify -inkey user.crt -certin -sigfile grades/outputs/grades.sig -in grades/outputs/grades.sha256
 ```
 Signature Verified Successfully
 
