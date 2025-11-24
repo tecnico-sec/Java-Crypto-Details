@@ -308,7 +308,7 @@ Remember that the `ImageAESCipher` implementation has been weakened, by having a
 Watch the generated images and switch quickly between them.
 
 Take two images (e.g., image1 and image2) and cipher them both.
-XOR image1 with the ciphered image2.  
+XOR ciphered image1 with ciphered image2.  
 What did you obtain?
 Why?
 
