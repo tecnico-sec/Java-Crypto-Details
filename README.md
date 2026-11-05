@@ -160,7 +160,7 @@ The resolution number is part of the file name.
 The `ImageMixer` class is available to facilitate the operations on images.
 Different code examples are available, such as the `RandomImageGenerator`, `ImageXor`, and `ImageAESCipher` classes.
 
-## One-Time Pads (Symmetric stream cipher)
+## 1. One-Time Pads (Symmetric stream cipher)
 
 If they could be correctly used in practice, one-time pads would provide perfect security.
 One of the constraints to make them work as expected is that the key stream must never be reused.
@@ -208,7 +208,7 @@ Legend: C stands for cipher-text, M for plain-text, K for key, ⊕ for XOR
 The result you get is the XOR of the images.
 You can experiment with other images and sizes.
 
-## Block Cipher Modes
+## 2. Block Cipher Modes
 
 Now that you know that keys should never be reused, remember that the way you use them is also important.
 
@@ -216,7 +216,7 @@ We will use a symmetric-key encryption algorithm working in blocks to encrypt th
 We will use different modes, namely:
 ECB (Electronic Code Book), CBC (Cipher Block Chaining) and OFB (Output FeedBack).
 
-### ECB (Electronic Code Book)
+### 2.1. ECB (Electronic Code Book)
 
 In the ECB mode, each block is independently encrypted with the key:
 
@@ -245,7 +245,7 @@ Try the same thing with the other images (especially with other sizes).
 
 **NOTE**: The observable visual encryption pattern emitted by ECB mode can be observered independently of the chosen security provider and the generated AES key as it is a consequence of its operational design.
 
-### CBC (Cipher Block Chaining)
+### 2.2. CBC (Cipher Block Chaining)
 
 In CBC mode, each block M[i] is XORed with the ciphertext from the previous block, and then encrypted with key k:
 
@@ -285,7 +285,7 @@ Now watch the images `glider-aes-cbc.png`, `tux-aes-cbc.png`, and `tecnico-aes-c
 Look to the first lines of pixels.
 Can you see what is going on?
 
-### OFB (Output FeedBack)
+### 2.3. OFB (Output FeedBack)
 
 In the OFB mode, the IV is encrypted with the key to make a keystream that is then XORed with the plaintext to make the cipher text.
 
@@ -314,12 +314,12 @@ Why?
 
 What is more secure to use: CBC or OFB?
 
-## Asymmetric ciphers
+## 3. Asymmetric ciphers
 
 The goal now is to use asymmetric ciphers, with separate private and public keys.
 RSA is the most well known of these algorithms.
 
-### Generating a pair of keys with OpenSSL
+### 3.1. Generating a pair of keys with OpenSSL
 
 Generate the key pair for the server:
 
@@ -333,7 +333,7 @@ And for the user:
 openssl genrsa -out user.key
 ```
 
-### Generating a self-signed certificate
+### 3.2. Generating a self-signed certificate
 
 Create a Certificate Signing Request for the server, using its key (you can leave the parameters empty):
 
@@ -358,7 +358,7 @@ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt -
 openssl req -x509 -days 365 -key server.key -out server.crt -addext "basicConstraints=CA:TRUE"
 ```
 
-### Signing a certificate
+### 3.3. Signing a certificate
 
 Generate a Certificate Signing Request for the user, using its key:
 
@@ -378,7 +378,7 @@ openssl verify -CAfile server.crt user.crt
 ```
 user.crt: OK
 
-### Signing a file
+### 3.4. Signing a file
 
 Create a digest of the `grades.txt` file:
 ```bash
@@ -399,7 +399,8 @@ openssl pkeyutl -verify -inkey user.crt -certin -sigfile grades/outputs/grades.s
 Signature Verified Successfully
 
 Try modifying the `grades.sha256` file and rerunning the verification to see what happens.
-### Reading the generated pair of keys with Java
+
+### 3.5. Reading the generated pair of keys with Java
 
 To read the generated keys in Java it is necessary to convert them to the right format.
 
@@ -427,7 +428,7 @@ Read the key files using the following command:
 rsa-key-gen r private_key.der public_key.der
 ```
 
-### Generating a pair of keys with Java
+### 3.6. Generating a pair of keys with Java
 
 Generate a new pair of RSA Keys.
 
@@ -446,7 +447,7 @@ This is acceptable because the RSA cipher is mostly used to cipher keys or hashe
 For large data, hybrid cipher is most suited, combining RSA with AES, for example.
 For this exercise you can cipher one block at a time.
 
-## File tampering exercise
+## 4. File tampering exercise
 
 In the directory `grades/inputs`, you can find the file `grades.txt`, the plaintext of a file with the grades of a course.
 This flat-file database has a rigid structure: 64 bytes for name, and 16 bytes for each of the other fields, number, age and grade.
